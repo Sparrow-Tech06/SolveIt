@@ -10,7 +10,8 @@
                --game-card: #ffffff ;
                
                --heading-text: #000 ;
-               
+
+               --primary-text: #60B5FF ;
            }
     
     @media (prefers-color-scheme: dark) {
@@ -25,7 +26,8 @@
                 --game-card: #6a6b9c ;
                 
                 --heading-text: #FFD65A ;
-                
+
+                --primary-text: #F1EFEC ;
            }
         
     }    
@@ -107,6 +109,9 @@
            font-family: 'Roboto', sans-serif;
        }
 
+        b {
+             color:var(--primary-text);
+        }
         .progress {
             height: 10px;
             margin-bottom: 15px;
