@@ -1,0 +1,160 @@
+     
+        :root {
+               --font-family: 'Poppins', sans-serif;
+               
+               --bg-color: #ffffff;
+               --text-color: #000000;
+               
+               --header-bg: #B771E5;
+               
+               --game-card: #ffffff ;
+               
+               --heading-text: #000 ;
+               
+           }
+    
+    @media (prefers-color-scheme: dark) {
+        :root {
+                --font-family: 'Poppins', sans-serif;
+                
+                --bg-color: #1f1f1f;
+                --text-color: #f0f0f0;
+                
+                --header-bg: #6f3ba3;
+                
+                --game-card: #2a2a2a ;
+                
+                --heading-text: #FFD65A ;
+                
+           }
+        
+    }    
+
+       body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+    /**********************************************************/    
+         .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 10px ;
+            background-color: var(--header-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+          .header-title {
+            margin: 0 auto;
+            text-align: center;
+            color: var(--text-color);
+          }
+       .header .bi {
+            background: #fff ; /* Modern purple color */
+            color: #6C63FF; /* White icon */
+            font-size: 1.2rem;
+            padding: 4px 10px;
+            border-radius: 8px; /* Slightly larger rounded corners */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+    /*******************************************************/
+        .game-card {
+            background: var(--game-card);
+            border: 0px solid #ff5722;
+            border-radius: 8px; 
+            margin: 40px auto;
+            max-width: 620px;
+            width: 90%;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0,  0.1);
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        
+       /* Quiz box styles */
+       .quiz-box {
+         border: 1px solid #ddd;
+         padding: 15px;
+         width: 100%;
+         width: 100%;
+         text-align: center;
+         border-radius: 5px;
+         margin-bottom: 10px;
+         font-size: 18px;
+       }
+       
+       h1 {
+           text-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
+           color: var(--heading-text);
+           font-family: 'Roboto', sans-serif;
+       }
+
+        .progress {
+            height: 10px;
+            margin-bottom: 15px;
+            color: #EFB6C8;
+            transition: width 1s ease-in-out;
+        }
+        .feedback {
+            font-size: 18px;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .feedback.correct {
+            color: #28a745;
+            animation: fadeFeedback 0.5s ease;
+        }
+
+        .feedback.wrong {
+            color: #dc3545;
+            animation: fadeFeedback 0.5s ease;
+        }
+
+        @keyframes fadeFeedback {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-custom {
+            font-size: 1.25rem;
+            margin-top: 10px;
+        }
+        input {
+            font-size: 1.25rem;
+            text-align: center;
+            margin: 30px auto;
+        }
+        
+        /* Timer styles */
+       .timer {
+         font-size: 15px;
+         color: #ff5722;
+         margin-bottom: 0px;
+       }
+        
+        
+        
+        
+        
+        
+        
+        
