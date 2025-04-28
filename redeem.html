@@ -2,17 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover">
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Form</title>
-    
     <style>
         * {
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: Arial, sans-serif;
         }
         
         body {
@@ -97,7 +92,6 @@
             padding: 15px;
             border-radius: 4px;
             text-align: center;
-            display: none;
         }
         
         .success {
@@ -114,6 +108,11 @@
             background-color: #fff3cd;
             color: #856404;
         }
+        
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
     </style>
 </head>
 <body>
@@ -127,6 +126,9 @@
             
             <!-- Device Fingerprint -->
             <input type="hidden" name="device_id" id="deviceId">
+            
+            <!-- Referer Verification -->
+            <input type="hidden" name="referer_verified" id="refererVerified" value="false">
             
             <!-- Form Fields -->
             <div class="form-group">
@@ -149,14 +151,13 @@
             </div>
             
             <!-- Submission Result -->
-            <div id="result" class="hidden"></div>
+            <div id="result"></div>
         </form>
     </div>
 
     <script>
         // Generate a device fingerprint
         function generateDeviceId() {
-            // Combine several browser and device characteristics
             const navigatorKeys = [
                 'userAgent', 'platform', 'hardwareConcurrency',
                 'deviceMemory', 'language', 'languages'
@@ -164,7 +165,6 @@
             
             let fingerprint = '';
             
-            // Navigator properties
             navigatorKeys.forEach(key => {
                 if (navigator[key]) {
                     if (Array.isArray(navigator[key])) {
@@ -175,20 +175,15 @@
                 }
             });
             
-            // Screen properties
             fingerprint += screen.width + screen.height + screen.colorDepth;
-            
-            // Timezone
             fingerprint += new Date().getTimezoneOffset();
             
-            // Canvas fingerprint (simplified)
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             if (ctx) {
                 fingerprint += ctx.font;
             }
             
-            // Hash the fingerprint to make it shorter
             return hashCode(fingerprint);
         }
         
@@ -198,7 +193,7 @@
             for (let i = 0; i < str.length; i++) {
                 const char = str.charCodeAt(i);
                 hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32bit integer
+                hash = hash & hash;
             }
             return hash.toString();
         }
@@ -214,29 +209,64 @@
             return false;
         }
         
+        // Check if coming from index.html
+        function isComingFromIndex() {
+            const referrer = document.referrer;
+            if (!referrer) return false;
+            
+            try {
+                const referrerUrl = new URL(referrer);
+                const currentUrl = new URL(window.location.href);
+                
+                // Check if same domain and coming from index.html
+                return referrerUrl.hostname === currentUrl.hostname && 
+                       referrerUrl.pathname.endsWith('index.html');
+            } catch (e) {
+                return false;
+            }
+        }
+        
         // Main script execution
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('contactForm');
             const result = document.getElementById('result');
             const submitBtn = document.getElementById('submitBtn');
             const deviceIdField = document.getElementById('deviceId');
+            const refererVerifiedField = document.getElementById('refererVerified');
             
             // Generate and set device ID
             const deviceId = generateDeviceId();
             deviceIdField.value = deviceId;
             
-            // Check if already submitted today
-            if (checkDailySubmission(deviceId)) {
+            // Check referer first
+            const validReferer = isComingFromIndex();
+            refererVerifiedField.value = validReferer;
+            
+            if (!validReferer) {
+                result.innerHTML = "This form can only be accessed by clicking the link from our homepage (index.html).";
+                result.className = "info";
                 submitBtn.disabled = true;
+                return;
+            }
+            
+            // Then check daily submission limit
+            if (checkDailySubmission(deviceId)) {
                 result.innerHTML = "You can only submit this form once per day. Please try again tomorrow.";
                 result.className = "warning";
-                result.style.display = "block";
+                submitBtn.disabled = true;
                 return;
             }
             
             // Form submission handler
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                if (!validReferer) {
+                    result.innerHTML = "Invalid access detected. Form cannot be submitted.";
+                    result.className = "error";
+                    return;
+                }
+                
                 submitBtn.disabled = true;
                 
                 const formData = new FormData(form);
@@ -248,24 +278,19 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Store submission date in localStorage
                         localStorage.setItem(`formSubmission_${deviceId}`, new Date().toISOString());
-                        
                         result.innerHTML = "Thank you for your submission! We'll get back to you soon.";
                         result.className = "success";
-                        result.style.display = "block";
                         form.reset();
                     } else {
                         result.innerHTML = data.message || "There was an error submitting your form. Please try again.";
                         result.className = "error";
-                        result.style.display = "block";
                         submitBtn.disabled = false;
                     }
                 })
                 .catch(error => {
                     result.innerHTML = "There was an error submitting your form. Please try again.";
                     result.className = "error";
-                    result.style.display = "block";
                     submitBtn.disabled = false;
                 });
             });
