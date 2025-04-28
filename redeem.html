@@ -209,7 +209,7 @@
             return false;
         }
         
-        // Check if coming from index.html
+        // Check if coming from Quiz.html
         function isComingFromIndex() {
             const referrer = document.referrer;
             if (!referrer) return false;
@@ -218,9 +218,9 @@
                 const referrerUrl = new URL(referrer);
                 const currentUrl = new URL(window.location.href);
                 
-                // Check if same domain and coming from index.html
+                // Check if same domain and coming from Quiz.html
                 return referrerUrl.hostname === currentUrl.hostname && 
-                       referrerUrl.pathname.endsWith('index.html');
+                       referrerUrl.pathname.endsWith('Quiz.html');
             } catch (e) {
                 return false;
             }
@@ -243,7 +243,7 @@
             refererVerifiedField.value = validReferer;
             
             if (!validReferer) {
-                result.innerHTML = "This form can only be accessed by clicking the link from our homepage (index.html).";
+                result.innerHTML = " ";
                 result.className = "info";
                 submitBtn.disabled = true;
                 return;
