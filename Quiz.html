@@ -45,7 +45,7 @@
             max-width: 90%;
         }
         .option-btn {
-            padding: 15px 10px;
+            padding: 12px 10px;
             font-size: 16px;
             cursor: pointer;
             background-color: #ffffff;
@@ -129,6 +129,7 @@
         .trophy {
             width: 100px;
             height: 100px;
+            aspect-ratio: 1 / 1;
         }
     </style>
 </head>
@@ -143,6 +144,14 @@
         <div id="result" class="result"></div>
         <div id="timer"></div>
         <button id="nextBtn" class="next-btn" style="display: none;" disabled>Next Question</button>
+
+
+        <div class="ad-counter">
+             Today Patience score: <span id="adCount">0</span>/10
+       </div>
+    
+       <a id="alternativeLink" class="alternative-link" href="redeem.html" target="_blank">Woo, YOU played 10 quizzes</a>
+         
     </div>
     
     <div id="resultContainer" style="display: none;">
@@ -152,12 +161,6 @@
         <button id="playAgainBtn" class="play-again-btn">Play Again</button>
     </div>
     
-    <div class="ad-counter">
-        Today Patience score: <span id="adCount">0</span>/10
-    </div>
-    
-    <a id="alternativeLink" class="alternative-link" href="redeem.html" target="_blank">Woo, YOU played 10 quizzes</a>
-        
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Quiz data
@@ -519,5 +522,11 @@
             }
         }
     </script>
+
+    <!-- Include the connection alert JS -->
+    <script src="connection-alert.js?v=1.4"></script>
+
+    <script src="version-check.js"> </script>
+    
 </body>
 </html>
