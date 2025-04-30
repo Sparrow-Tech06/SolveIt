@@ -36,8 +36,10 @@
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
         .options {
-            display: flex;
-            flex-direction: column;
+          /*  display: flex;
+            flex-direction: column; */
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 15px;
             margin: 20px auto;
             max-width: 90%;
@@ -66,7 +68,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
-            margin-top: 20px;
+            margin: 30px auto;
         }
         .next-btn:disabled {
             background-color: #cccccc;
@@ -80,7 +82,7 @@
         .alternative-link {
             display: none;
             color: #4285F4;
-            text-decoration: underline;
+            text-decoration: none;
             cursor: pointer;
             margin-top: 20px;
         }
