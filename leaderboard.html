@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Mobile Leaderboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Vue.js -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --accent-color: #fd79a8;
+            --text-color: #2d3436;
+            --light-bg: #ffffff;
+           /* --card-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); */
+            --male-color: #3498db;
+            --female-color: #e84393;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 660px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .leaderboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 0;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .leaderboard-card {
+            background: white;
+            border:0.5px solid #e3e3e3;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
+        }
+        
+        .profile-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .male-img {
+            border: 3px solid var(--male-color);
+        }
+        
+        .female-img {
+            border: 3px solid var(--female-color);
+        }
+        
+        .rank-badge {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-right: 0.75rem;
+        }
+        
+        .top-1 {
+            background-color: #fdcb6e;
+        }
+        
+        .top-2 {
+            background-color: #a4b0be;
+        }
+        
+        .top-3 {
+            background-color: #cd6133;
+        }
+        
+        .rank-4plus {
+            background-color: var(--primary-color);
+        }
+        
+        .coin-count {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .time-period {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        
+        .user-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.1rem;
+        }
+        
+        .user-handle {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 400px) {
+            .profile-img {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .user-name {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <div class="leaderboard-header text-center">
+            <h2 class="mb-1"><i class="bi bi-trophy-fill"></i> Leaderboard</h2>
+            <div class="time-period">
+                <i class="bi bi-calendar"></i> Jan 7 - Jan 20
+            </div>
+        </div>
+        
+        <!-- Leaderboard List -->
+        <div class="container-fluid p-2">
+            <div v-for="(user, index) in users" :key="user.id" class="leaderboard-card d-flex align-items-center">
+                <div :class="['rank-badge', 
+                             index === 0 ? 'top-1' : 
+                             index === 1 ? 'top-2' : 
+                             index === 2 ? 'top-3' : 'rank-4plus']">
+                    {{ index + 1 }}
+                </div>
+                <img :src="user.gender === 'male' ? maleImage : femaleImage" 
+                     :class="['profile-img', 'me-3', user.gender === 'male' ? 'male-img' : 'female-img']" 
+                     :alt="user.name">
+                <div class="flex-grow-1">
+                    <div class="user-name">{{ user.name }}</div>
+                    <div class="user-handle">{{ user.handle }}</div>
+                </div>
+                <div class="coin-count">
+                    <i class="bi bi-coin"></i> {{ formatNumber(user.coins) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    maleImage: 'https://img.icons8.com/color/48/000000/circled-user-male-skin-type-7.png',
+                    femaleImage: 'https://img.icons8.com/color/48/000000/circled-user-female-skin-type-7.png',
+                    users: [
+                        { id: 1, name: 'Alex Johnson', handle: 'alexj', coins: 5240, gender: 'male' },
+                        { id: 2, name: 'Sarah Williams', handle: 'sarahw', coins: 4850, gender: 'female' },
+                        { id: 3, name: 'Michael Brown', handle: 'michaelb', coins: 4720, gender: 'male' },
+                        { id: 4, name: 'Emma Davis', handle: 'emmad', coins: 4150, gender: 'female' },
+                        { id: 5, name: 'David Wilson', handle: 'davidw', coins: 3980, gender: 'male' },
+                        { id: 6, name: 'Olivia Martinez', handle: 'oliviam', coins: 3750, gender: 'female' },
+                        { id: 7, name: 'James Anderson', handle: 'jamesa', coins: 3420, gender: 'male' },
+                        { id: 8, name: 'Sophia Thomas', handle: 'sophiat', coins: 3150, gender: 'female' },
+                        { id: 9, name: 'Robert Taylor', handle: 'robertt', coins: 2980, gender: 'male' },
+                        { id: 10, name: 'Ava Garcia', handle: 'avag', coins: 2750, gender: 'female' }
+                    ]
+                }
+            },
+            methods: {
+                formatNumber(num) {
+                    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                }
+            }
+        }).mount('#app');
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
