@@ -27,6 +27,7 @@
             :root {
               --light-bg: #3E3F5B ;
               --text-color: #fff;
+              --header-bg:#6A6B9C;
             }
         } 
   /************************************************/      
@@ -59,7 +60,7 @@
         .container-fluid { max-width:660px; }
         
         .leaderboard-card {
-            background: white;
+            background: var(--header-bg);
             border:0.5px solid #e3e3e3;
             border-radius: 12px;
             box-shadow: var(--card-shadow);
@@ -127,6 +128,7 @@
         }
         
         .user-name {
+            color:var(--text-color);
             font-size: 0.95rem;
             font-weight: 600;
             margin-bottom: 0.1rem;
