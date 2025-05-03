@@ -13,13 +13,17 @@
             --text-color: #333;
 
             --quiz-bg: #FFBE98;
+
+            --opt-button-color: #ffffff;
          }
         @media (prefers-color-scheme: dark) {
             :root {
               --background-color: #3E3F5B;
               --text-color: #fff;
 
-              --quiz-bg: #FFBE98;
+              --quiz-bg: #B771E5;
+
+              --opt-button-color: #B771E5;  
             }
         } 
     /***********************************************/    
@@ -90,7 +94,7 @@
             padding: 12px 10px;
             font-size: 16px;
             cursor: pointer;
-            background-color: #ffffff;
+            background-color: var(--opt-button-color);
             border: 1px solid #e3e3e3;
             border-radius: 15px;
         }
