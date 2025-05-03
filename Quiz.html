@@ -282,9 +282,27 @@
     <script>
         // Quiz data
         const quizQuestions = [
-            { question: "What is 5 + 3?", options: ["7", "8", "9", "10"], correctAnswer: "8" },
-            { question: "What is 19 - 11?", options: ["7", "8", "9", "10"], correctAnswer: "8" }
-        ];
+    { question: "What is 5 + 3?", options: ["7", "10", "8", "9"], correctAnswer: "8" }, // 3rd option
+    { question: "What is 19 - 11?", options: ["8", "7", "10", "9"], correctAnswer: "8" }, // 1st option
+    { question: "What is 7 + 6?", options: ["12", "14", "15", "13"], correctAnswer: "13" }, // 4th option
+    { question: "What is 15 - 8?", options: ["6", "7", "9", "8"], correctAnswer: "7" }, // 2nd option
+    { question: "What is 9 + 4?", options: ["13", "12", "14", "15"], correctAnswer: "13" }, // 1st option
+    { question: "What is 17 - 9?", options: ["7", "10", "9", "8"], correctAnswer: "8" }, // 4th option
+    { question: "What is 6 + 9?", options: ["15", "14", "17", "16"], correctAnswer: "15" }, // 1st option
+    { question: "What is 14 - 6?", options: ["9", "8", "7", "10"], correctAnswer: "8" }, // 2nd option
+    { question: "What is 8 + 7?", options: ["14", "16", "15", "17"], correctAnswer: "15" }, // 3rd option
+    { question: "What is 20 - 12?", options: ["9", "10", "7", "8"], correctAnswer: "8" }, // 4th option
+    { question: "What is 5 + 8?", options: ["14", "13", "12", "15"], correctAnswer: "13" }, // 2nd option
+    { question: "What is 16 - 8?", options: ["9", "7", "8", "10"], correctAnswer: "8" }, // 3rd option
+    { question: "What is 4 + 9?", options: ["15", "14", "12", "13"], correctAnswer: "13" }, // 4th option
+    { question: "What is 18 - 10?", options: ["8", "7", "9", "10"], correctAnswer: "8" }, // 1st option
+    { question: "What is 7 + 8?", options: ["16", "15", "14", "17"], correctAnswer: "15" }, // 2nd option
+    { question: "What is 13 - 6?", options: ["8", "7", "6", "9"], correctAnswer: "7" }, // 2nd option
+    { question: "What is 6 + 7?", options: ["15", "14", "13", "12"], correctAnswer: "13" }, // 3rd option
+    { question: "What is 21 - 13?", options: ["7", "9", "8", "10"], correctAnswer: "8" }, // 3rd option
+    { question: "What is 9 + 6?", options: ["17", "16", "15", "14"], correctAnswer: "15" }, // 3rd option
+    { question: "What is 22 - 14?", options: ["7", "9", "10", "8"], correctAnswer: "8" } // 4th option
+];
 
         // Game state
         let currentQuestionIndex = 0;
