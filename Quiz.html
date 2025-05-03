@@ -241,7 +241,7 @@
             <div id="finalScore"></div>
             <div id="coinsEarned"></div>
             <button id="homeBtn" class="home-btn">Back to Home</button>
-            <button id="extraCoinsBtn" class="extra-coins-btn">Get Extra 25 Coins</button>
+            <button id="extraCoinsBtn" class="extra-coins-btn"> Get Extra 25 Points </button>
         </div>
     </div>
 
@@ -547,7 +547,7 @@
             quizContainer.style.display = 'none';
             resultContainer.style.display = 'block';
             finalScoreElement.textContent = `Your score: ${score}/${quizQuestions.length}`;
-            coinsEarnedElement.textContent = `You receive 5 points!`;
+            coinsEarnedElement.textContent = `Awesom You receive 5 points!`;
         }
 
         // Reset quiz
@@ -600,7 +600,7 @@
                         saveCoins();
                         Swal.fire({
                             title: 'Thank You!',
-                            text: '25 coins have been added to your wallet!',
+                            text: '25 points have been added to your wallet!',
                             icon: 'success'
                         });
                         resetQuiz();
