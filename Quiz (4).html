@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover">
+    <title>SolveIt - Quiz Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://web3forms.com/client/script.js" async defer></script>
+    <style>
+        :root {
+            --background-color: #ffffff;
+            --text-color: #333;
+            --quiz-bg: #FFBE98;
+            --opt-button-color: #ffffff;
+         }
+        @media (prefers-color-scheme: dark) {
+            :root {
+              --background-color: #3E3F5B;
+              --text-color: #fff;
+              --quiz-bg: #6A6B9C;
+              --opt-button-color: #6A6B9C;  
+            }
+        } 
+    /***********************************************/    
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-color);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            min-width: 100vw;
+        }
+    /***********************************************/    
+        .user-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            flex: 1;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom: 3px solid #8B5DFF;
+            font-weight: bold;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    /********************************************/    
+        .quiz-container {
+            margin: 30px auto;
+            display: none;
+            max-width: 660px;
+        }
+        .question {
+            font-size: 20px;
+            margin-bottom: 40px;
+            background-color: var(--quiz-bg);
+            padding: 40px 20px;
+            border: 2px solid orange;
+            border-radius: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 15px;
+            margin: 20px auto;
+            max-width: 90%;
+        }
+        .option-btn {
+            padding: 12px 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: var(--opt-button-color);
+            border: 1px solid #e3e3e3;
+            border-radius: 15px;
+        }
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+    /*******************************************/    
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .ad-counter {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .start-btn, .play-again-btn, .home-btn, .extra-coins-btn {
+            padding: 10px 30px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .start-btn, .play-again-btn {
+            background-color: #8B5DFF;
+        }
+        .home-btn {
+            background-color: #4285F4;
+            margin-right: 10px;
+        }
+        .extra-coins-btn {
+            background-color: #34A853;
+        }
+        #timer {
+            margin-top: 10px;
+            font-size: 18px;
+            color: #4285F4;
+        }
+        #progress {
+            margin: 10px 0;
+            font-weight: bold;
+            color: #666;
+        }
+        #resultContainer {
+            height: auto;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px 20px;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }    
+        .final-result {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #finalScore {
+            margin: 20px auto;
+            color: #60B5FF;
+            font-size: 22px;
+        }
+        .trophy {
+            width: 100px;
+            height: 100px;
+        }
+    /**************************************/    
+        .reward-container {
+            text-align: center;
+            padding: 20px;
+        }
+        .wallet-balance {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #8B5DFF;
+        }
+        .min-redeem {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .redeem-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .redeem-form input, .redeem-form select {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .redeem-btn {
+            padding: 10px;
+            background-color: #8B5DFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .hidden {
+            display: none;
+        }
+        .leaderboard {
+            padding: 10px;
+            background-color: #8B5DFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            margin:0 auto;
+            max-width: 520px;
+            display: block;
+        }
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false">
+    <!-- Loader Overlay -->
+    <div id="loader" class="loader-overlay">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- User Info Display -->
+    <div id="userInfo" class="user-info"></div>
+
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="quiz"> Quiz </button>
+        <button class="tab-btn" data-tab="rewards"> My Points </button>
+    </div>
+
+    <div id="quiz" class="tab-content active">
+        <h1>Quiz Game</h1>
+        <div id="progress"></div>
+        <button id="startBtn" class="start-btn">Start Quiz</button>
+        
+        <div id="quizContainer" class="quiz-container">
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+            <div id="result" class="result"></div>
+            <div id="timer" class="hidden"></div>
+            
+            <div class="ad-counter">
+                Extra Coins Collected Today: <span id="adCount">0</span>/10
+            </div>
+        </div>
+        
+        <div id="resultContainer" style="display: none;">
+            <div class="final-result">Quiz Completed!</div>
+            <img src="trophy.svg" class="trophy" draggable="false" alt="Trophy">
+            <div id="finalScore"></div>
+            <div id="coinsEarned"></div>
+            <button id="homeBtn" class="home-btn">Back to Home</button>
+            <button id="extraCoinsBtn" class="extra-coins-btn"> Get Extra 25 Points </button>
+        </div>
+    </div>
+
+    <div id="rewards" class="tab-content">
+        <div class="reward-container">
+            <h2> Submit To LeaderBoard </h2>
+            <div class="wallet-balance">
+                My Points : <span id="walletBalance">0</span> coins
+            </div>
+            <div class="min-redeem">
+                Minimum submit: 1200 coins
+            </div>
+            <form id="redeemForm" class="redeem-form" action="https://api.web3forms.com/submit" method="POST">
+                <input type="hidden" name="access_key" value="165a9647-54cc-4e12-954f-17c533af72f8">
+                <input type="hidden" name="subject" value="Coin Redemption Request">
+                <input type="hidden" name="coins" id="formCoins" value="">
+                <input type="hidden" name="amount" id="formAmount" value="">
+                
+                <input type="text" id="name" name="name" placeholder="Your Name" required>
+                <input type="email" id="email" name="email" placeholder="Your Email" required>
+                <input type="text" id="upiId" name="upi_id" placeholder="Enter App ID / Name" required>
+                <select id="redeemAmount" name="redeem_amount" required>
+                    <option value="" disabled selected>Select Points</option>
+                    <option value="10"> 1200 points = extra 10 coin </option>
+                </select>
+                <button type="submit" id="redeemBtn" class="redeem-btn"> Submit To LeaderBoard </button>
+                <small> *Only top 10 users are showing on leaderboard. Coins are used only for leaderboard ranking. </small>
+            </form>
+            <div id="form-result" class="hidden"></div>
+        </div>
+        <a href="leaderboard.html" class="leaderboard"> Go To Leaderboard </a>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
+        import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
+            authDomain: "authentication-b93f7.firebaseapp.com",
+            projectId: "authentication-b93f7",
+            storageBucket: "authentication-b93f7.appspot.com",
+            messagingSenderId: "254632724536",
+            appId: "1:254632724536:web:ecd4a8da767dbcc009becd",
+            measurementId: "G-85HL8MWJDC"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Quiz data
+        const quizQuestions = [
+            { question: "What is 5 + 3?", options: ["7", "10", "8", "9"], correctAnswer: "8" },
+            { question: "What is 19 - 11?", options: ["8", "7", "10", "9"], correctAnswer: "8" },
+            { question: "What is 6 × 4?", options: ["18", "24", "20", "22"], correctAnswer: "24" },
+            { question: "What is 20 ÷ 5?", options: ["3", "5", "4", "6"], correctAnswer: "4" },
+            { question: "What is 12 + 15?", options: ["25", "27", "28", "26"], correctAnswer: "27" },
+            { question: "What is 30 - 14?", options: ["14", "16", "18", "15"], correctAnswer: "16" },
+            { question: "What is 7 × 8?", options: ["54", "56", "58", "52"], correctAnswer: "56" },
+            { question: "What is 45 ÷ 9?", options: ["6", "5", "7", "4"], correctAnswer: "5" },
+            { question: "What is 25 + 38?", options: ["61", "63", "65", "60"], correctAnswer: "63" },
+            { question: "What is 50 - 27?", options: ["21", "23", "25", "22"], correctAnswer: "23" }
+        ];
+
+        // Game state
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let adsWatchedToday = 0;
+        let timer;
+        let timeLeft = 10;
+        let coins = 0;
+        let quizCompleted = false;
+        let currentUser = null;
+        let answerSubmitted = false;
+
+        // DOM elements
+        const startBtn = document.getElementById('startBtn');
+        const quizContainer = document.getElementById('quizContainer');
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const resultElement = document.getElementById('result');
+        const adCountElement = document.getElementById('adCount');
+        const timerElement = document.getElementById('timer');
+        const resultContainer = document.getElementById('resultContainer');
+        const finalScoreElement = document.getElementById('finalScore');
+        const coinsEarnedElement = document.getElementById('coinsEarned');
+        const homeBtn = document.getElementById('homeBtn');
+        const extraCoinsBtn = document.getElementById('extraCoinsBtn');
+        const progressElement = document.getElementById('progress');
+        const walletBalanceElement = document.getElementById('walletBalance');
+        const redeemAmountSelect = document.getElementById('redeemAmount');
+        const redeemForm = document.getElementById('redeemForm');
+        const formResult = document.getElementById('form-result');
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const loader = document.getElementById('loader');
+        const userInfoElement = document.getElementById('userInfo');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initFirebaseAuth();
+            
+            loadCoins();
+            updateWalletBalance();
+            
+            startBtn.addEventListener('click', startQuiz);
+            homeBtn.addEventListener('click', resetQuiz);
+            extraCoinsBtn.addEventListener('click', showExtraCoinsConfirmation);
+            
+            // Tab switching
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+
+            // Web3Forms setup
+            if (redeemForm) {
+                redeemForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const amount = parseInt(redeemAmountSelect.value);
+                    const requiredCoins = amount * 120;                               // 20 = 200 coin
+                    
+                    if (coins < requiredCoins) {
+                        Swal.fire('Error', `You need ${requiredCoins} coins to submition`, 'error');
+                        return;
+                    }
+                    
+                    document.getElementById('formCoins').value = requiredCoins;
+                    document.getElementById('formAmount').value = amount;
+                    
+                    const formData = new FormData(redeemForm);
+                    fetch(redeemForm.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            coins -= requiredCoins;
+                            saveCoins();
+                            updateWalletBalance();
+                            
+                            Swal.fire(
+                                'Success!',
+                                `Your LeaderBoard submition request has been submitted.`,
+                                'success'
+                            );
+                            redeemForm.reset();
+                        } else {
+                            Swal.fire('Error', 'There was an error submitting your request. Please try again.', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', 'There was an error submitting your request. Please try again.', 'error');
+                    });
+                });
+            }
+        });
+
+        // Initialize Firebase Auth
+        function initFirebaseAuth() {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    userInfoElement.textContent = `Logged in as: ${user.email}`;
+                    await loadAdCountFromFirebase();
+                    loader.style.display = 'none';
+                } else {
+                    // Redirect to login if not authenticated
+                    window.location.href = "index.html";
+                }
+            });
+        }
+
+        // Load ad count from Firebase (with daily reset)
+        async function loadAdCountFromFirebase() {
+            if (!currentUser) return;
+
+            const today = new Date().toDateString();
+            const userRef = doc(db, 'users', currentUser.uid);
+            
+            try {
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+                    const lastAdDate = data.lastAdDate?.toDate().toDateString();
+                    
+                    if (lastAdDate !== today) {
+                        // Reset count if it's a new day
+                        await updateDoc(userRef, {
+                            adViews: 0,
+                            lastAdDate: new Date()
+                        });
+                        adsWatchedToday = 0;
+                    } else {
+                        adsWatchedToday = data.adViews || 0;
+                    }
+                } else {
+                    // Create new user document if doesn't exist
+                    await setDoc(userRef, {
+                        email: currentUser.email,
+                        adViews: 0,
+                        lastAdDate: new Date()
+                    });
+                    adsWatchedToday = 0;
+                }
+                updateAdCounterUI();
+            } catch (error) {
+                console.error("Error loading ad count:", error);
+                Swal.fire('Error', 'Could not load ad data. Please try again.', 'error');
+            }
+        }
+
+        // Update ad count in Firebase
+        async function updateAdCountInFirebase() {
+            if (!currentUser) return;
+
+            try {
+                const userRef = doc(db, 'users', currentUser.uid);
+                await updateDoc(userRef, {
+                    adViews: adsWatchedToday,
+                    lastAdDate: new Date()
+                });
+                return true;
+            } catch (error) {
+                console.error("Error updating ad count:", error);
+                return false;
+            }
+        }
+
+        // Switch tabs
+        function switchTab(tabId) {
+            tabBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tabId) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        // Load coins from localStorage
+        function loadCoins() {
+            const storedCoins = localStorage.getItem('userCoins');
+            if (storedCoins) {
+                coins = parseInt(storedCoins);
+            }
+        }
+
+        // Save coins to localStorage
+        function saveCoins() {
+            localStorage.setItem('userCoins', coins.toString());
+            updateWalletBalance();
+        }
+
+        // Update ad counter UI
+        function updateAdCounterUI() {
+            adCountElement.textContent = adsWatchedToday;
+        }
+
+        // Update wallet balance UI
+        function updateWalletBalance() {
+            walletBalanceElement.textContent = coins;
+        }
+
+        // Show interstitial ad for coins (Android only)
+        function showInterstitialAdForCoins() {
+            if (window.Android && typeof window.Android.showRewardedAd === 'function') {
+                // Android version - setup callback
+                window.adCompleteCallback = async function(success) {
+                    if (success && currentUser) {
+                        adsWatchedToday++;
+                        coins += 25;                          // ADDED extra 25 Coins
+                        
+                        // Update Firebase first
+                        const firebaseSuccess = await updateAdCountInFirebase();
+                        
+                        if (firebaseSuccess) {
+                            saveCoins();
+                            Swal.fire({
+                                title: 'Thank You!',
+                                text: '25 points have been added to your wallet!',
+                                icon: 'success'
+                            });
+                            updateAdCounterUI();
+                            resetQuiz();
+                        } else {
+                            // Rollback if Firebase update fails
+                            adsWatchedToday--;
+                            coins -= 25;
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Could not record your ad view. Please try again.',
+                                icon: 'error'
+                            });
+                        }
+                    } else {
+                        Swal.fire({
+                            title: 'Ad Not Completed',
+                            text: 'The ad was not fully watched. No points added.',
+                            icon: 'info'
+                        });
+                    }
+                };
+                window.Android.showRewardedAd();
+            } else {
+                // Web version - no coins added
+                Swal.fire({
+                    title: 'Ad Not Available',
+                    text: 'Ads are only available in the Android app version',
+                    icon: 'info'
+                });
+                resetQuiz();
+            }
+        }
+
+        // Show confirmation for extra coins
+        function showExtraCoinsConfirmation() {
+            if (adsWatchedToday >= 10) {
+                Swal.fire({
+                    title: 'Limit Reached',
+                    text: 'You have already watched the maximum ads for today!',
+                    icon: 'info'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Get Extra 25 Points',
+                text: 'Watch a short ad to earn 25 extra points!',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Watch Ad',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showInterstitialAdForCoins();
+                }
+            });
+        }
+
+        // Start the quiz
+        function startQuiz() {
+            startBtn.style.display = 'none';
+            quizContainer.style.display = 'block';
+            currentQuestionIndex = 0;
+            score = 0;
+            quizCompleted = false;
+            answerSubmitted = false;
+            showQuestion();
+        }
+
+        // Display current question
+        function showQuestion() {
+            if (currentQuestionIndex >= quizQuestions.length) {
+                endQuiz();
+                return;
+            }
+
+            answerSubmitted = false;
+            const question = quizQuestions[currentQuestionIndex];
+            questionElement.textContent = question.question;
+            optionsElement.innerHTML = '';
+
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option-btn');
+                button.addEventListener('click', () => selectAnswer(option));
+                optionsElement.appendChild(button);
+            });
+
+            updateProgress();
+            // Timer will start only after answer is submitted
+            timerElement.classList.add('hidden');
+        }
+
+        // Select an answer
+        function selectAnswer(selectedOption) {
+            if (answerSubmitted) return;
+            answerSubmitted = true;
+            
+            const question = quizQuestions[currentQuestionIndex];
+            const options = optionsElement.querySelectorAll('.option-btn');
+
+            options.forEach(option => {
+                option.disabled = true;
+                if (option.textContent === question.correctAnswer) {
+                    option.style.backgroundColor = '#4CAF50';
+                } else if (option.textContent === selectedOption && selectedOption !== question.correctAnswer) {
+                    option.style.backgroundColor = '#F44336';
+                }
+            });
+
+            if (selectedOption === question.correctAnswer) {
+                score++;
+                resultElement.textContent = 'Correct!';
+                resultElement.style.color = '#4CAF50';
+            } else {
+                resultElement.textContent = `Wrong! Correct answer: ${question.correctAnswer}`;
+                resultElement.style.color = '#F44336';
+            }
+
+            // Start timer after answer is submitted
+            startTimer();
+        }
+
+        // Start timer for current question
+        function startTimer() {
+            timeLeft = 6;                                               // 6 seconds delay before next question
+            timerElement.textContent = `Next question in: ${timeLeft}s`;
+            timerElement.classList.remove('hidden');
+
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.textContent = `Next question in: ${timeLeft}s`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    moveToNextQuestion();
+                }
+            }, 1000);
+        }
+
+        // Move to next question after timer ends
+        function moveToNextQuestion() {
+            currentQuestionIndex++;
+            resultElement.textContent = '';
+            timerElement.classList.add('hidden');
+            showQuestion();
+        }
+
+        // Update progress indicator
+        function updateProgress() {
+            progressElement.textContent = `Question ${currentQuestionIndex + 1} of ${quizQuestions.length}`;
+        }
+
+        // End the quiz
+        function endQuiz() {
+            clearInterval(timer);
+            quizContainer.style.display = 'none';
+            resultContainer.style.display = 'flex';
+            
+                                                     // Always award added exactly 5 coins
+            const totalCoins = 5;
+            
+            coins += totalCoins;
+            saveCoins();
+            
+            finalScoreElement.textContent = `Your Score: ${score}/${quizQuestions.length}`;
+            coinsEarnedElement.textContent = `Points Earned: ${totalCoins}`;
+            quizCompleted = true;
+        }
+
+        // Reset the quiz
+        function resetQuiz() {
+            resultContainer.style.display = 'none';
+            startBtn.style.display = 'inline-block';
+            resultElement.textContent = '';
+            timerElement.classList.add('hidden');
+        }
+    </script>
+
+    <script src="version-check.js"> </script>
+</body>
+</html>
