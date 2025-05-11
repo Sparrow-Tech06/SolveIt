@@ -174,7 +174,10 @@
                 </div>
                 <img :src="user.gender === 'male' ? maleImage : femaleImage" 
                      :class="['profile-img', 'me-3', user.gender === 'male' ? 'male-img' : 'female-img']" 
-                     :alt="user.name">
+                     :alt="user.name" 
+                     loading="lazy" 
+                     draggable="false">
+                
                 <div class="flex-grow-1">
                     <div class="user-name">{{ user.name }}</div>
                     <div class="user-handle">{{ user.handle }}</div>
