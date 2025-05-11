@@ -1,397 +1,226 @@
 <!DOCTYPE html>
-<html lang="en" ng-app>
+<html lang="en">
 <head>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,shrink-to-fit=no,viewport-fit=cover"> 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-title" content="SolveIt - Fun Math Game">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="SolveIt - Fun Math Game">
-    <meta name="application-name" content="SolveIt - Fun Math Game">
-    <meta name="msapplication-TileColor" content="#7e57c2">
-    <meta name="theme-color" content="#7e57c2">
-    <meta name="color-scheme" content="light">
-    <meta name="google" content="notranslate">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Login</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <meta property="og:title" content="SolveIt - Fun Math Game">
-    <meta property="og:description" content="Boost your math skills with SolveIt! A fun and interactive math game covering addition, subtraction, multiplication, and division.">
-    
-    <title> SolveIt - Fun Math Game </title>
-    <meta name="description" content="Boost your math skills with SolveIt! A fun and interactive math game covering addition, subtraction, multiplication, and division.">
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-    
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
-    
-    <style>
-        
-        :root {
-            --font-family: 'Poppins', sans-serif;
-            --bg-color: #ffffff;
-            --sidebar-bg: #fdf4ff;
-            --header-bg: #B771E5;
-            --text-color: #000000;
-            --card-bg: linear-gradient(90deg, #B771E5, #9D52D5);
-            --card-text-color: #ffffff;
-            --list-item-bg: #f9e6ff;
-            --list-item-hover-bg: #efccff;
-            --social-icon-bg: #ffffff;
-            
-            --offcanvas-header:  none;
-            --close-btn-filter: invert(0);
-            
-            --color1: #a3d5ff ;
-            --color2: #cbb6ff ;
-            --color3: #ffd1a3 ;
-            --color4: #ff99c1 ;
-            --color5: #F7CFD8 ;
-            --color6: #a3eeff ;
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">  
+
+  <style>
+      :root { 
+           --bg-color: #B771E5;
+           --form-color: #ffffff;
+           --text-color: #000000;
         }
-
-        @media (prefers-color-scheme: dark) {
+      @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #3E3F5B;
-                --sidebar-bg: #3E3F5B;
-                --header-bg: #6a6b9c;
-                --text-color: #f0f0f0;
-                --card-bg: linear-gradient(90deg, #6f3ba3, #562a86);
-                --card-text-color: #f0f0f0;
-                --list-item-bg: #6a6b9c;
-                --list-item-hover-bg: #5c5d8a;
-                --social-icon-bg: #333333;
-                
-                --offcanvas-header: #6a6b9c ;
-                --close-btn-filter: invert(1);
-                
-                --color1: #1dd1a1;
-                --color3: #ff6b6b;
-                --color2: #ffcc00;
-                --color4: #54a0ff;
-                --color5: #FFA38F;
-                --color6: #f368e0;
+                 --bg-color: #3E3F5B;
+                 --form-color: #6a6b9c;
+                 --text-color: #f0f0f0;
             }
-        }
-        
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
-        
-        a {
-            text-decoration: none;
-            underline: none;
-            color: var(--text-color);
-        }
-        a:hover {
-            text-decoration: none;
-            underline: none;
-            color: var(--text-color);
-        }
-        
-        /**********************************************************/    
-         header {
-           /* background-color: #B771E5;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
-          }
-         /* .header-title {
-            color: #ffffff;
-          } */
-          /* Make the toggle button larger */
-        .btn-lg {
-            font-size: 1.5rem; /* Increase font size */
-           /* padding: 0.75rem 0rem;  Increase padding */
-        }
-        /**********************************************************/  
-          .offcanvas {
-            background-color: var(--sidebar-bg);
-            width: 300px;
-        }
+        }  
 
-        .custom-header {
-            background-color: var(--header-bg); 
-            color: var(--text-color);
-            font-family: 'Montserrat', sans-serif;
-        }
-        
-        .offcanvas-header {
-            background: var(--offcanvas-header);
-            color: var(--text-color);
-        }
-        .offcanvas-header > .btn-close {
-            -webkit-filter: var(--close-btn-filter);
-                    filter: var(--close-btn-filter);
-        }
+      * {
+          margin: 0;
+          padding: 0;
+          box-shadow: border-box;
+          user-select: none;
+          font-family: 'Poppins', sans-serif;
+      }
+      body {
+          font-family: 'Poppins', sans-serif;
+          min-height: 100vh;
+          background: var(--bg-color);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin: 0;
+          padding: 0;
+          box-shadow: border-box;
+          user-select: none;
+       }
 
-        .profile-card {
-            background: var(--card-bg);
-            color: var(--card-text-color);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .profile-card h5 {
-            margin: 0;
-            font-size: 1.2rem;
-        }
-
-        .profile-card p {
-            margin: 5px 0 10px;
-            font-size: 0.9rem;
-        }
-
-        .profile-card .coins {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 1rem;
-            background: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            color: var(--header-bg);
-        }
-
-        .list-group-item {
-            border: none;
-            padding: 15px;
-            font-size: 1rem;
-            font-family: 'Poppins', sans-serif;
-            background: var(--list-item-bg);
-            margin-bottom: 10px;
-            border-radius: 10px;
-            transition: background 0.3s ease;
-        }
-
-        .list-group-item a {
-            text-decoration: none;
-            color: var(--text-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .list-group-item:hover {
-            background-color: var(--list-item-hover-bg);
-        }
-
-        .social-icons {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-            gap: 10px;
-        }
-
-        .social-icons a {
-            text-decoration: none;
-            font-size: 1.2rem;
-            color: white;
-            width: 38px;
-            height: 38px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .telegram { background: #0088cc; }
-        .whatsapp { background: #25d366; }
-        .instagram { background: #FF6363; }
-        
-    /****************************************************************/    
-        .container{
-            max-width: 620px;
-            margin: 0 auto;
-        }
-
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 100%;
-            margin: 0 auto;
-        }
-
-        .sound-box {
-            background-color: #dbefff;
-            color: var(--text-color);
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .sound-box:hover {
-            transform: scale(0.98);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .sound-icon {
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 50%;
-            padding: 20px;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-
-        .sound-icon img {
-            width: 40px;
-            height: 40px;
-            mix-blend-mode: normal;
-            filter: none;
-        }
-
-        .sound-label {
-            font-size: 16px;
-            font-weight: bold;
-            color: #34495e;
-            text-align: center;
-        }
-
-        .blue {  background-color: var(--color1); }
-
-        .purple {  background-color: var(--color2); }
-
-        .orange {  background-color: var(--color3); }
-
-        .pink {  background-color: var(--color4); }
-
-        .green {  background-color: var(--color5); }
-
-        .lightblue {  background-color: var(--color6); }
-        
-    </style>
+      main {
+         min-height: 70vh;
+         background: var(--form-color);
+         color: var(--text-color);
+         position: absolute;
+         bottom: 0px;
+         border-top-left-radius: 30px;
+         border-top-right-radius: 30px;
+         width: 100%;
+         padding: 30px 30px 15px;
+         box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    }
+      
+   </style>
     
 </head>
 <body oncontextmenu= "return false">
-    
-    <header class="d-flex justify-content-start align-items-center py-1 custom-header">
-        <button class="btn btn-lg text-white" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
-            <i class="bi bi-list fs-4"></i>
-        </button>
-        <h5 class="ms-2 mb-0 text-white"> SolveIt </h5>
-    </header>
 
-    <!-- Sidebar / Offcanvas -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
-        <div class="offcanvas-header">
-            <h5 id="sidebarMenuLabel"> SolveIt </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-
-            <!-- Menu Items -->
-            <ul class="list-group my-2">
-                <li class="list-group-item">
-                    <a href="privacy-policy.html"><span><i class="bi bi-shield-lock me-2"></i> Privacy Policy </span> <i class="bi bi-chevron-right"></i></a>
-                </li>
-                <!--<li class="list-group-item">
-                    <a href="terms-conditions.html"><span><i class="bi bi-file-earmark-text me-2"></i> Terms of Service </span> <i class="bi bi-chevron-right"></i></a>
-                </li>-->
-                <li class="list-group-item">
-                    <a href="https://wa.me/917430971730"><span><i class="bi bi-question-circle me-2"></i> Help & Support </span> <i class="bi bi-chevron-right"></i></a>
-                </li>
-                <li class="list-group-item">
-                    <a href="leaderboard.html"><span><i class="bi bi-trophy-fill me-2"></i> LeaderBoard </span> <i class="bi bi-chevron-right"></i></a>
-                </li>
-                <li class="list-group-item">
-                    <a href="https://wa.me/?text=https://indusapp.store/ek22orci"><span><i class="bi bi-people me-2"></i> Share with Friends </span> <i class="bi bi-chevron-right"></i></a>
-                </li>
-            </ul>
-
-            <!-- Follow Us Section --->
-            <div class="text-center mt-4">
-                <h6 style="color: var(--text-color);"> Follow Us On </h6>
-                <div class="social-icons">
-                    <a href="https://t.me/SparrowTech06" class="telegram"><i class="bi bi-telegram"></i></a>
-                    <a href="https://whatsapp.com/channel/0029Vb4W8AyKLaHsnHSOjz2t" class="whatsapp"><i class="bi bi-whatsapp"></i></a>
-                    <a href="https://youtube.com/@sparrow-tech?si=yXsp5-EKXL5yjVIR" class="instagram"><i class="bi bi-youtube"></i></a>
+  <main class="container">
+          
+          <div class="card-body">
+            <form id="loginForm" novalidate>
+              <div class="mb-1">
+                <label for="email" class="form-label">Email </label>
+                <input type="email" id="email" class="form-control" placeholder="Enter Email" required>
+                <div class="invalid-feedback">Please enter a valid email address</div>
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <div class="input-group">
+                  <input type="password" id="password" class="form-control" placeholder="Enter Password" required>
+                  <button type="button" class="btn btn-secondary" id="togglePassword">
+                    <i class="bi bi-eye-slash"></i>
+                  </button>
+                  <div class="invalid-feedback">Password must be at least 6 characters</div>
                 </div>
-            </div>
-            
-        </div>
-    </div>
-   
-    <div class="container my-3 text-center">
-        <h1 class="mb-4"> Math Game </h1>
-        
-        <div class="grid-container">
-                 
-                <a href= "add-game.html"  class="sound-box blue">
-                    <div class="sound-icon">
-                        <img src="addition.png" alt="addition" draggable="false">
-                    </div>
-                    <div class="sound-label"> Addition </div>
-                </a>
-                <a href= "sub-game.html"  class="sound-box purple">
-                    <div class="sound-icon">
-                        <img src="subtraction.png" alt="subtraction" draggable="false">
-                    </div>
-                    <div class="sound-label"> Subtraction </div>
-                </a>
-                <a href= "mul-game.html" class="sound-box pink">
-                    <div class="sound-icon">
-                        <img src="multiplication.png" alt="multiplication" draggable="false">
-                    </div>
-                    <div class="sound-label"> Multiplication </div>
-                </a>
-                <a href= "div-game.html" class="sound-box orange">
-                    <div class="sound-icon">
-                        <img src="division.png" alt="division" draggable="false">
-                    </div>
-                    <div class="sound-label"> Division </div>
-                </a>
-                <a href= "Quiz.html"  class="sound-box green">
-                    <div class="sound-icon">
-                        <img src="quiz.png" alt="quiz logo" draggable="false">
-                    </div>
-                    <div class="sound-label"> Play Quiz </div>
-                </a>
-                <a href= "https://t.me/SparrowTech06"  class="sound-box lightblue">
-                    <div class="sound-icon">
-                        <img src="telegram.png" alt="telegram" draggable="false">
-                    </div>
-                    <div class="sound-label"> Join Telegram </div>
-                </a>
-        </div>
-        
-    </div>
-    
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    
-    <!-- Include the connection alert JS -->
-    <script src="connection-alert.js?v=1.4"></script>
+              </div>
+              <button type="submit" class="btn btn-primary w-100" id="loginButton">
+                <span id="buttonText">Login</span>
+                <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+              </button>
+            </form>
+            <hr>
+            <p class="small text-center mt-2"> Forgot Account? <a href="#" id="registerLink"> Contact Us </a></p>
+          </div>
 
-    <script src="version-check.js"> </script>
-    
-    
+  </main>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
+      authDomain: "authentication-b93f7.firebaseapp.com",
+      projectId: "authentication-b93f7",
+      storageBucket: "authentication-b93f7.appspot.com",
+      messagingSenderId: "254632724536",
+      appId: "1:254632724536:web:ecd4a8da767dbcc009becd",
+      measurementId: "G-85HL8MWJDC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM Elements
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const loginButton = document.getElementById('loginButton');
+    const buttonText = document.getElementById('buttonText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const registerLink = document.getElementById('registerLink');
+
+    // Auto-login if already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+
+    // Input Validation
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function validatePassword(password) {
+      return password.length >= 6;
+    }
+
+    // Toggle Password Visibility
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+    });
+
+    // Form Submission
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      // Validate inputs
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      let isValid = true;
+
+      if (!validateEmail(email)) {
+        emailInput.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        emailInput.classList.remove('is-invalid');
+      }
+
+      if (!validatePassword(password)) {
+        passwordInput.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        passwordInput.classList.remove('is-invalid');
+      }
+
+      if (!isValid) return;
+
+      // Set loading state
+      loginButton.disabled = true;
+      buttonText.textContent = 'Processing...';
+      loadingSpinner.classList.remove('d-none');
+
+      const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
+      localStorage.setItem("deviceId", deviceId);
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        Swal.fire("Success", "Login successful!", "success").then(() => {
+          window.location.href = 'dashboard.html';
+        });
+      } catch (loginError) {
+        if (loginError.code === 'auth/user-not-found') {
+          // Check if device already registered
+          const deviceRef = doc(db, "devices", deviceId);
+          const deviceSnap = await getDoc(deviceRef);
+
+          if (deviceSnap.exists()) {
+            Swal.fire("Denied", "Only one account per device is allowed.", "error");
+            return;
+          }
+
+          // Auto create account for device
+          try {
+            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            await setDoc(doc(db, "devices", deviceId), { uid: userCred.user.uid, email });
+            Swal.fire("Registered", "Account created and logged in!", "success").then(() => {
+              window.location.href = 'dashboard.html';
+            });
+          } catch (regError) {
+            Swal.fire("Error", regError.message, "error");
+          }
+        } else {
+          Swal.fire("Login Failed", loginError.message, "error");
+        }
+      } finally {
+        // Reset loading state
+        loginButton.disabled = false;
+        buttonText.textContent = 'Login';
+        loadingSpinner.classList.add('d-none');
+      }
+    });
+
+    // Register link handler
+    registerLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      emailInput.focus();
+    });
+  </script>
 </body>
 </html>
