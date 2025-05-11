@@ -457,7 +457,7 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     currentUser = user;
-                    userInfoElement.textContent = `Logged in as: ${user.email}`;
+                    userInfoElement.textContent = `Wellcome User: ${user.email}`;
                     await loadAdCountFromFirebase();
                     loader.style.display = 'none';
                 } else {
