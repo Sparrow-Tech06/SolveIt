@@ -13,13 +13,15 @@
             --text-color: #333;
             --quiz-bg: #FFBE98;
             --opt-button-color: #ffffff;
+            --user-info-bg: #B771E5;
          }
         @media (prefers-color-scheme: dark) {
             :root {
               --background-color: #3E3F5B;
               --text-color: #fff;
               --quiz-bg: #6A6B9C;
-              --opt-button-color: #6A6B9C;  
+              --opt-button-color: #6A6B9C;
+              --user-info-bg: #6a6b9c;
             }
         } 
     /***********************************************/    
@@ -43,11 +45,15 @@
         }
     /***********************************************/    
         .user-info {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+            position: ;
+            top: 0px;
+            right: 0px;
             font-size: 14px;
             color: var(--text-color);
+            background: var(--user-info-bg);
+            padding:10px;
+            margin-bottom:20px;
+            text-align:left;
         }
         .tabs {
             display: flex;
@@ -230,9 +236,7 @@
             align-items: center;
             z-index: 1000;
         }
-        .user-info {
-            padding: 15px 10px;
-        }
+        
     </style>
 </head>
 <body oncontextmenu="return false">
