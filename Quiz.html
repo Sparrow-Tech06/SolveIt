@@ -584,7 +584,7 @@
                             saveCoins();
                             Swal.fire({
                                 title: 'Thank You!',
-                                text: '25 points have been added to your wallet!',
+                                text: '25 extra points have been added to your wallet!',
                                 icon: 'success'
                             });
                             updateAdCounterUI();
@@ -623,20 +623,22 @@
         function showExtraCoinsConfirmation() {
             if (adsWatchedToday >= 10) {
                 Swal.fire({
-                    title: 'Limit Reached',
-                    text: 'You have already watched the maximum ads for today!',
+                    title: 'Daily Limit Reached',
+                    text: 'You’ve earned all extra points for today. Come back tomorrow!',
                     icon: 'info'
                 });
                 return;
             }
 
             Swal.fire({
-                title: 'Get Extra 25 Points',
-                text: 'Watch a short ad to earn 25 extra points!',
+                title: 'Get Extra 25 Points?',
+                text: 'Watch a short ad to get 25 extra points!',
                 icon: 'info',
                 showCancelButton: true,
-                confirmButtonText: 'Watch Ad',
-                cancelButtonText: 'Cancel'
+                confirmButtonText: 'Yes, show ad',
+                cancelButtonText: 'No, Maybe Later',
+                allowOutsideClick: false,
+                allowEscapeKey: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     showInterstitialAdForCoins();
