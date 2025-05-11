@@ -273,7 +273,7 @@
         
         <div id="resultContainer" style="display: none;">
             <div class="final-result">Quiz Completed!</div>
-            <img src="trophy.svg" class="trophy" draggable="false" alt="Trophy">
+            <img src="assect/trophy.svg" class="trophy" draggable="false" alt="Trophy">
             <div id="finalScore"></div>
             <div id="coinsEarned"></div>
             <button id="homeBtn" class="home-btn">Back to Home</button>
@@ -601,9 +601,9 @@
                         }
                     } else {
                         Swal.fire({
-                            title: 'Ad Not Completed',
-                            text: 'The ad was not fully watched. No points added.',
-                            icon: 'info'
+                            title: 'Ad Not Available',
+                            text: 'The ad is not ready yet. Please try again later.',
+                            icon: 'error'
                         });
                     }
                 };
@@ -624,7 +624,7 @@
             if (adsWatchedToday >= 10) {
                 Swal.fire({
                     title: 'Daily Limit Reached',
-                    text: 'You’ve earned all extra points for today. Come back tomorrow!',
+                    text: 'You’ve claimed all extra points for today. Come back tomorrow!',
                     icon: 'info'
                 });
                 return;
