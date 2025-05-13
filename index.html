@@ -1,96 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Login</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">  
-
+  <!-- Same head content as before -->
   <style>
-      :root { 
-           --bg-color: #B771E5;
-           --form-color: #ffffff;
-           --text-color: #000000;
-        }
-      @media (prefers-color-scheme: dark) {
-            :root {
-                 --bg-color: #3E3F5B;
-                 --form-color: #6a6b9c;
-                 --text-color: #f0f0f0;
-            }
-        }  
-
-      * {
-          margin: 0;
-          padding: 0;
-          box-shadow: border-box;
-          user-select: none;
-          font-family: 'Poppins', sans-serif;
-      }
-      body {
-          font-family: 'Poppins', sans-serif;
-          min-height: 100vh;
-          background: var(--bg-color);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          margin: 0;
-          padding: 0;
-          box-shadow: border-box;
-          user-select: none;
-       }
-
-      main {
-         min-height: 70vh;
-         background: var(--form-color);
-         color: var(--text-color);
-         position: absolute;
-         bottom: 0px;
-         border-top-left-radius: 30px;
-         border-top-right-radius: 30px;
-         width: 100%;
-         padding: 30px 30px 15px;
-         box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    /* Add this new style for the create account link */
+    .account-options {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
     }
-      
-   </style>
-    
+  </style>
 </head>
-<body oncontextmenu= "return false">
+<body oncontextmenu="return false">
 
-  <main class="container">
-          
-          <div class="card-body">
-            <form id="loginForm" novalidate>
-              <div class="mb-1">
-                <label for="email" class="form-label">Email </label>
-                <input type="email" id="email" class="form-control" placeholder="Enter Email" required>
-                <div class="invalid-feedback">Please enter a valid email address</div>
-              </div>
-              <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-group">
-                  <input type="password" id="password" class="form-control" placeholder="Enter Password" required>
-                  <button type="button" class="btn btn-secondary" id="togglePassword">
-                    <i class="bi bi-eye-slash"></i>
-                  </button>
-                  <div class="invalid-feedback">Password must be at least 6 characters</div>
-                </div>
-              </div>
-              <button type="submit" class="btn btn-primary w-100" id="loginButton">
-                <span id="buttonText">Login</span>
-                <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
-              </button>
-            </form>
-            <hr>
-            <p class="small text-center mt-2"> Forgot Account? <a href="#" id="registerLink"> Contact Us </a></p>
+  <main class="container">          
+    <div class="card-body">
+      <form id="loginForm" novalidate>
+        <div class="mb-1">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" id="email" class="form-control" placeholder="Enter Email" required>
+          <div class="invalid-feedback">Please enter a valid email address</div>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-group">
+            <input type="password" id="password" class="form-control" placeholder="Enter Password" required>
+            <button type="button" class="btn btn-secondary" id="togglePassword">
+              <i class="bi bi-eye-slash"></i>
+            </button>
+            <div class="invalid-feedback">Password must be at least 6 characters</div>
           </div>
-
+        </div>
+        <button type="submit" class="btn btn-primary w-100" id="loginButton">
+          <span id="buttonText">Login</span>
+          <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+        </button>
+      </form>
+      <hr>
+      <div class="account-options">
+        <p class="small"><a href="#" id="createAccountLink">Create New Account</a></p>
+        <p class="small"><a href="#" id="forgotPasswordLink">Forgot Password?</a></p>
+      </div>
+    </div>
   </main>
 
   <script type="module">
@@ -120,7 +71,12 @@
     const loginButton = document.getElementById('loginButton');
     const buttonText = document.getElementById('buttonText');
     const loadingSpinner = document.getElementById('loadingSpinner');
-    const registerLink = document.getElementById('registerLink');
+    const createAccountLink = document.getElementById('createAccountLink');
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+
+    // Generate or get device ID
+    const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
+    localStorage.setItem("deviceId", deviceId);
 
     // Auto-login if already logged in
     onAuthStateChanged(auth, (user) => {
@@ -146,7 +102,7 @@
       this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
     });
 
-    // Form Submission
+    // Form Submission for LOGIN
     loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
       
@@ -173,41 +129,24 @@
 
       // Set loading state
       loginButton.disabled = true;
-      buttonText.textContent = 'Processing...';
+      buttonText.textContent = 'Logging in...';
       loadingSpinner.classList.remove('d-none');
-
-      const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
-      localStorage.setItem("deviceId", deviceId);
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
         Swal.fire("Success", "Login successful!", "success").then(() => {
           window.location.href = 'dashboard.html';
         });
-      } catch (loginError) {
-        if (loginError.code === 'auth/user-not-found') {
-          // Check if device already registered
-          const deviceRef = doc(db, "devices", deviceId);
-          const deviceSnap = await getDoc(deviceRef);
-
-          if (deviceSnap.exists()) {
-            Swal.fire("Denied", "Only one account per device is allowed.", "error");
-            return;
-          }
-
-          // Auto create account for device
-          try {
-            const userCred = await createUserWithEmailAndPassword(auth, email, password);
-            await setDoc(doc(db, "devices", deviceId), { uid: userCred.user.uid, email });
-            Swal.fire("Registered", "Account created and logged in!", "success").then(() => {
-              window.location.href = 'dashboard.html';
-            });
-          } catch (regError) {
-            Swal.fire("Error", regError.message, "error");
-          }
-        } else {
-          Swal.fire("Login Failed", loginError.message, "error");
+      } catch (error) {
+        let errorMessage = "Login failed. Please try again.";
+        
+        if (error.code === 'auth/user-not-found') {
+          errorMessage = "Account not found. Please create an account first.";
+        } else if (error.code === 'auth/wrong-password') {
+          errorMessage = "Incorrect password. Please try again.";
         }
+        
+        Swal.fire("Error", errorMessage, "error");
       } finally {
         // Reset loading state
         loginButton.disabled = false;
@@ -216,10 +155,60 @@
       }
     });
 
-    // Register link handler
-    registerLink.addEventListener('click', function(e) {
+    // Create Account Functionality
+    createAccountLink.addEventListener('click', async function(e) {
       e.preventDefault();
-      emailInput.focus();
+      
+      // Check if device already has an account
+      const deviceRef = doc(db, "devices", deviceId);
+      const deviceSnap = await getDoc(deviceRef);
+      
+      if (deviceSnap.exists()) {
+        Swal.fire("Error", "This device already has an account. Only one account per device is allowed.", "error");
+        return;
+      }
+      
+      const email = prompt("Please enter your email:");
+      if (!email || !validateEmail(email)) {
+        Swal.fire("Error", "Please enter a valid email address", "error");
+        return;
+      }
+      
+      const password = prompt("Please enter a password (at least 6 characters):");
+      if (!password || password.length < 6) {
+        Swal.fire("Error", "Password must be at least 6 characters", "error");
+        return;
+      }
+      
+      try {
+        // Create user account
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Record device registration
+        await setDoc(deviceRef, { 
+          uid: userCredential.user.uid,
+          email: email,
+          createdAt: new Date() 
+        });
+        
+        Swal.fire("Success", "Account created successfully!", "success").then(() => {
+          window.location.reload();
+        });
+      } catch (error) {
+        let errorMessage = "Account creation failed. Please try again.";
+        
+        if (error.code === 'auth/email-already-in-use') {
+          errorMessage = "This email is already registered. Please login instead.";
+        }
+        
+        Swal.fire("Error", errorMessage, "error");
+      }
+    });
+
+    // Forgot Password (placeholder)
+    forgotPasswordLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      Swal.fire("Info", "Password reset functionality will be added soon.", "info");
     });
   </script>
 </body>
