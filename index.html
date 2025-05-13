@@ -71,6 +71,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+    import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
@@ -84,6 +85,24 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Generate or get device ID
+    const getDeviceId = () => {
+      let deviceId = localStorage.getItem('deviceId');
+      if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        localStorage.setItem('deviceId', deviceId);
+      }
+      return deviceId;
+    };
+
+    // Check if device already has an account
+    const checkDeviceAccount = async (deviceId) => {
+      const deviceRef = doc(db, "devices", deviceId);
+      const deviceSnap = await getDoc(deviceRef);
+      return deviceSnap.exists();
+    };
 
     // Auto-redirect if already logged in
     onAuthStateChanged(auth, (user) => {
