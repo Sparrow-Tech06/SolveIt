@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Login</title>
+  <title>Secure Account Access</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -27,8 +27,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin: 0;
-      padding: 0;
     }
     main {
       min-height: 70vh;
@@ -42,18 +40,17 @@
       padding: 30px 30px 15px;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
-    .account-info {
-      font-size: 0.8rem;
-      color: #666;
+    .account-options {
+      display: flex;
+      justify-content: center;
       margin-top: 10px;
     }
   </style>
 </head>
 <body oncontextmenu="return false">
-
-  <main class="container">
+  <main class="container">          
     <div class="card-body">
-      <h3 class="text-center mb-4">Login or Create Account</h3>
+      <h3 class="text-center mb-4">Account Access</h3>
       <form id="authForm" novalidate>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
@@ -70,14 +67,14 @@
             <div class="invalid-feedback">Password must be 6+ characters</div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary w-100" id="authButton">
+        <button type="submit" class="btn btn-primary w-100 mb-3" id="authButton">
           <span id="buttonText">Continue</span>
           <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none"></span>
         </button>
-        <div class="account-info text-center mt-3">
-          <p id="accountStatus">Enter your credentials to login or create account</p>
-        </div>
       </form>
+      <div class="text-center mt-3">
+        <p class="small text-muted">By continuing, you agree to our Terms of Service</p>
+      </div>
     </div>
   </main>
 
@@ -100,85 +97,43 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // DOM Elements
-    const authForm = document.getElementById('authForm');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const togglePassword = document.getElementById('togglePassword');
-    const authButton = document.getElementById('authButton');
-    const buttonText = document.getElementById('buttonText');
-    const loadingSpinner = document.getElementById('loadingSpinner');
-    const accountStatus = document.getElementById('accountStatus');
-
     // Generate or get device ID
     const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
     localStorage.setItem("deviceId", deviceId);
 
-    // Auto-login if already logged in
+    // Auto-redirect if already logged in
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        window.location.href = 'dashboard.html';
-      }
+      if (user) window.location.href = 'dashboard.html';
     });
 
     // Toggle Password Visibility
-    togglePassword.addEventListener('click', function() {
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
       this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
     });
 
-    // Check account status when email changes
-    emailInput.addEventListener('blur', async function() {
-      const email = this.value.trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
-      
-      try {
-        // Check if device already has an account
-        const deviceRef = doc(db, "devices", deviceId);
-        const deviceSnap = await getDoc(deviceRef);
-        
-        if (deviceSnap.exists()) {
-          const deviceEmail = deviceSnap.data().email;
-          if (deviceEmail === email) {
-            accountStatus.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> This device has an existing account`;
-            buttonText.textContent = 'Login';
-          } else {
-            accountStatus.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-warning"></i> This device already has an account with another email`;
-            buttonText.textContent = 'Continue';
-          }
-        } else {
-          accountStatus.innerHTML = `<i class="bi bi-info-circle-fill text-primary"></i> No account found - will create new one`;
-          buttonText.textContent = 'Create Account';
-        }
-      } catch (error) {
-        console.error("Error checking account:", error);
-      }
-    });
-
-    // Form Submission
-    authForm.addEventListener('submit', async function(e) {
+    // Main Authentication Form
+    document.getElementById('authForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const authButton = document.getElementById('authButton');
+      const buttonText = document.getElementById('buttonText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+
       // Validate inputs
-      const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
       let isValid = true;
-
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        emailInput.classList.add('is-invalid');
+        document.getElementById('email').classList.add('is-invalid');
         isValid = false;
-      } else {
-        emailInput.classList.remove('is-invalid');
       }
-
       if (password.length < 6) {
-        passwordInput.classList.add('is-invalid');
+        document.getElementById('password').classList.add('is-invalid');
         isValid = false;
-      } else {
-        passwordInput.classList.remove('is-invalid');
       }
-
       if (!isValid) return;
 
       // Set loading state
@@ -190,42 +145,48 @@
         // First try to login
         try {
           await signInWithEmailAndPassword(auth, email, password);
-          Swal.fire("Success", "Login successful!", "success").then(() => {
+          Swal.fire("Success", "Logged in successfully!", "success").then(() => {
             window.location.href = 'dashboard.html';
           });
           return;
         } catch (loginError) {
+          // If user not found, check device registration
           if (loginError.code === 'auth/user-not-found') {
-            // Check if device already registered with different email
             const deviceRef = doc(db, "devices", deviceId);
             const deviceSnap = await getDoc(deviceRef);
             
             if (deviceSnap.exists()) {
-              Swal.fire("Error", "This device already has an account with another email. Only one account per device is allowed.", "error");
+              // Device already registered with different account
+              Swal.fire("Error", "This device is already registered with another account. Only one account per device is allowed.", "error");
               return;
             }
-
-            // Create new account if no existing device account
-            const userCred = await createUserWithEmailAndPassword(auth, email, password);
-            await setDoc(doc(db, "devices", deviceId), { 
-              uid: userCred.user.uid, 
+            
+            // Create new account for this device
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            await setDoc(deviceRef, {
+              uid: userCredential.user.uid,
               email: email,
               createdAt: new Date()
             });
             
-            Swal.fire("Success", "Account created and logged in!", "success").then(() => {
+            Swal.fire("Success", "Account created successfully!", "success").then(() => {
               window.location.href = 'dashboard.html';
             });
-          } else if (loginError.code === 'auth/wrong-password') {
-            Swal.fire("Error", "Incorrect password. Please try again.", "error");
-          } else {
-            throw loginError;
+            return;
           }
+          
+          // For other login errors (like wrong password)
+          throw loginError;
         }
       } catch (error) {
-        Swal.fire("Error", error.message || "Authentication failed", "error");
+        let errorMessage = "Authentication failed. Please try again.";
+        if (error.code === 'auth/wrong-password') {
+          errorMessage = "Incorrect password. Please try again.";
+        } else if (error.code === 'auth/email-already-in-use') {
+          errorMessage = "This email is already registered with another device.";
+        }
+        Swal.fire("Error", errorMessage, "error");
       } finally {
-        // Reset loading state
         authButton.disabled = false;
         buttonText.textContent = 'Continue';
         loadingSpinner.classList.add('d-none');
