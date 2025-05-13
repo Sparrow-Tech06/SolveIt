@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Secure Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -27,6 +27,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      margin: 0;
+      padding: 0;
     }
     main {
       min-height: 70vh;
@@ -40,49 +42,49 @@
       padding: 30px 30px 15px;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
-    .account-options {
-      display: flex;
-      justify-content: space-between;
+    .account-info {
+      font-size: 0.8rem;
+      color: #666;
       margin-top: 10px;
     }
   </style>
 </head>
 <body oncontextmenu="return false">
-  <main class="container">          
+
+  <main class="container">
     <div class="card-body">
-      <h3 class="text-center mb-4">Login</h3>
-      <form id="loginForm" novalidate>
+      <h3 class="text-center mb-4">Login or Create Account</h3>
+      <form id="authForm" novalidate>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
-          <input type="email" id="email" class="form-control" placeholder="Enter Email" required>
-          <div class="invalid-feedback">Please enter valid email</div>
+          <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+          <div class="invalid-feedback">Please enter a valid email</div>
         </div>
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>
           <div class="input-group">
-            <input type="password" id="password" class="form-control" placeholder="Enter Password" required>
+            <input type="password" id="password" class="form-control" placeholder="Enter password (6+ characters)" required>
             <button type="button" class="btn btn-secondary" id="togglePassword">
               <i class="bi bi-eye-slash"></i>
             </button>
             <div class="invalid-feedback">Password must be 6+ characters</div>
           </div>
         </div>
-        <button type="submit" class="btn btn-primary w-100 mb-3" id="loginButton">
-          <span id="buttonText">Login</span>
+        <button type="submit" class="btn btn-primary w-100" id="authButton">
+          <span id="buttonText">Continue</span>
           <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none"></span>
         </button>
+        <div class="account-info text-center mt-3">
+          <p id="accountStatus">Enter your credentials to login or create account</p>
+        </div>
       </form>
-      <hr>
-      <div class="text-center">
-        <p>Don't have an account? <a href="register.html">Create Account</a></p>
-        <p><a href="#" id="forgotPasswordLink">Forgot Password?</a></p>
-      </div>
     </div>
   </main>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
-    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
@@ -96,69 +98,138 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM Elements
+    const authForm = document.getElementById('authForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const authButton = document.getElementById('authButton');
+    const buttonText = document.getElementById('buttonText');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const accountStatus = document.getElementById('accountStatus');
+
+    // Generate or get device ID
+    const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
+    localStorage.setItem("deviceId", deviceId);
 
     // Auto-login if already logged in
     onAuthStateChanged(auth, (user) => {
-      if (user) window.location.href = 'dashboard.html';
+      if (user) {
+        window.location.href = 'dashboard.html';
+      }
     });
 
     // Toggle Password Visibility
-    document.getElementById('togglePassword').addEventListener('click', function() {
-      const passwordInput = document.getElementById('password');
+    togglePassword.addEventListener('click', function() {
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
       this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
     });
 
-    // Login Form Submission
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
+    // Check account status when email changes
+    emailInput.addEventListener('blur', async function() {
+      const email = this.value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
       
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const loginButton = document.getElementById('loginButton');
-      const buttonText = document.getElementById('buttonText');
-      const loadingSpinner = document.getElementById('loadingSpinner');
-
-      // Validate inputs
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        document.getElementById('email').classList.add('is-invalid');
-        return;
-      }
-      if (password.length < 6) {
-        document.getElementById('password').classList.add('is-invalid');
-        return;
-      }
-
-      // Set loading state
-      loginButton.disabled = true;
-      buttonText.textContent = 'Logging in...';
-      loadingSpinner.classList.remove('d-none');
-
       try {
-        await signInWithEmailAndPassword(auth, email, password);
-        Swal.fire("Success", "Login successful!", "success").then(() => {
-          window.location.href = 'dashboard.html';
-        });
-      } catch (error) {
-        let errorMessage = "Login failed. Please try again.";
-        if (error.code === 'auth/user-not-found') {
-          errorMessage = "Account not found. Please create an account first.";
-        } else if (error.code === 'auth/wrong-password') {
-          errorMessage = "Incorrect password. Please try again.";
+        // Check if device already has an account
+        const deviceRef = doc(db, "devices", deviceId);
+        const deviceSnap = await getDoc(deviceRef);
+        
+        if (deviceSnap.exists()) {
+          const deviceEmail = deviceSnap.data().email;
+          if (deviceEmail === email) {
+            accountStatus.innerHTML = `<i class="bi bi-check-circle-fill text-success"></i> This device has an existing account`;
+            buttonText.textContent = 'Login';
+          } else {
+            accountStatus.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-warning"></i> This device already has an account with another email`;
+            buttonText.textContent = 'Continue';
+          }
+        } else {
+          accountStatus.innerHTML = `<i class="bi bi-info-circle-fill text-primary"></i> No account found - will create new one`;
+          buttonText.textContent = 'Create Account';
         }
-        Swal.fire("Error", errorMessage, "error");
-      } finally {
-        loginButton.disabled = false;
-        buttonText.textContent = 'Login';
-        loadingSpinner.classList.add('d-none');
+      } catch (error) {
+        console.error("Error checking account:", error);
       }
     });
 
-    // Forgot Password
-    document.getElementById('forgotPasswordLink').addEventListener('click', (e) => {
+    // Form Submission
+    authForm.addEventListener('submit', async function(e) {
       e.preventDefault();
-      Swal.fire("Info", "Please contact support to reset your password", "info");
+      
+      // Validate inputs
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      let isValid = true;
+
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        emailInput.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        emailInput.classList.remove('is-invalid');
+      }
+
+      if (password.length < 6) {
+        passwordInput.classList.add('is-invalid');
+        isValid = false;
+      } else {
+        passwordInput.classList.remove('is-invalid');
+      }
+
+      if (!isValid) return;
+
+      // Set loading state
+      authButton.disabled = true;
+      buttonText.textContent = 'Processing...';
+      loadingSpinner.classList.remove('d-none');
+
+      try {
+        // First try to login
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          Swal.fire("Success", "Login successful!", "success").then(() => {
+            window.location.href = 'dashboard.html';
+          });
+          return;
+        } catch (loginError) {
+          if (loginError.code === 'auth/user-not-found') {
+            // Check if device already registered with different email
+            const deviceRef = doc(db, "devices", deviceId);
+            const deviceSnap = await getDoc(deviceRef);
+            
+            if (deviceSnap.exists()) {
+              Swal.fire("Error", "This device already has an account with another email. Only one account per device is allowed.", "error");
+              return;
+            }
+
+            // Create new account if no existing device account
+            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            await setDoc(doc(db, "devices", deviceId), { 
+              uid: userCred.user.uid, 
+              email: email,
+              createdAt: new Date()
+            });
+            
+            Swal.fire("Success", "Account created and logged in!", "success").then(() => {
+              window.location.href = 'dashboard.html';
+            });
+          } else if (loginError.code === 'auth/wrong-password') {
+            Swal.fire("Error", "Incorrect password. Please try again.", "error");
+          } else {
+            throw loginError;
+          }
+        }
+      } catch (error) {
+        Swal.fire("Error", error.message || "Authentication failed", "error");
+      } finally {
+        // Reset loading state
+        authButton.disabled = false;
+        buttonText.textContent = 'Continue';
+        loadingSpinner.classList.add('d-none');
+      }
     });
   </script>
 </body>
