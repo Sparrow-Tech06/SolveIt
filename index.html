@@ -144,7 +144,16 @@
       try {
         // First try to login
         try {
-          await signInWithEmailAndPassword(auth, email, password);
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          
+          // Update device record on successful login
+          const deviceRef = doc(db, "devices", deviceId);
+          await setDoc(deviceRef, {
+            uid: userCredential.user.uid,
+            email: email,
+            lastLogin: new Date()
+          }, { merge: true });
+          
           Swal.fire("Success", "Logged in successfully!", "success").then(() => {
             window.location.href = 'dashboard.html';
           });
@@ -156,8 +165,7 @@
             const deviceSnap = await getDoc(deviceRef);
             
             if (deviceSnap.exists()) {
-              // Device already registered with different account
-              Swal.fire("Error", "This device is already registered with another account. Only one account per device is allowed.", "error");
+              Swal.fire("Error", "This device is already registered with another account.", "error");
               return;
             }
             
@@ -175,16 +183,21 @@
             return;
           }
           
-          // For other login errors (like wrong password)
+          // For other login errors
           throw loginError;
         }
       } catch (error) {
+        console.error("Authentication error:", error);
         let errorMessage = "Authentication failed. Please try again.";
+        
         if (error.code === 'auth/wrong-password') {
           errorMessage = "Incorrect password. Please try again.";
         } else if (error.code === 'auth/email-already-in-use') {
           errorMessage = "This email is already registered with another device.";
+        } else if (error.code === 'permission-denied') {
+          errorMessage = "Database permission denied. Please contact support.";
         }
+        
         Swal.fire("Error", errorMessage, "error");
       } finally {
         authButton.disabled = false;
