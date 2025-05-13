@@ -75,7 +75,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
     import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-    import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+    import { getFirestore, doc, setDoc, getDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
@@ -120,7 +120,6 @@
       const buttonText = document.getElementById('buttonText');
       const loadingSpinner = document.getElementById('loadingSpinner');
 
-      // Validate passwords match
       if (password !== confirmPassword) {
         Swal.fire({
           title: 'Error!',
@@ -130,35 +129,32 @@
         return;
       }
 
-      // Show loading state
       signupButton.disabled = true;
       buttonText.textContent = 'Creating account...';
       loadingSpinner.classList.remove('d-none');
 
       try {
         const deviceId = getDeviceId();
-        
-        // Check if device already has an account
         const deviceDoc = await getDoc(doc(db, "devices", deviceId));
         if (deviceDoc.exists()) {
           throw new Error("This device already has a registered account");
         }
 
-        // Create user in Firebase Auth
+        // Create user
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // Create user document in Firestore
-        await setDoc(doc(db, "users", userCredential.user.uid), {
+        // Batch write for atomic operation
+        const batch = writeBatch(db);
+        batch.set(doc(db, "users", userCredential.user.uid), {
           email: email,
-          createdAt: new Date()
+          createdAt: serverTimestamp()
         });
-
-        // Register device
-        await setDoc(doc(db, "devices", deviceId), {
+        batch.set(doc(db, "devices", deviceId), {
           uid: userCredential.user.uid,
           email: email,
-          registeredAt: new Date()
+          registeredAt: serverTimestamp()
         });
+        await batch.commit();
 
         Swal.fire({
           title: 'Success!',
@@ -174,7 +170,6 @@
           icon: 'error'
         });
       } finally {
-        // Reset button state
         signupButton.disabled = false;
         buttonText.textContent = 'Sign Up';
         loadingSpinner.classList.add('d-none');
