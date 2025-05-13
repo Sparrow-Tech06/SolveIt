@@ -75,7 +75,7 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
   import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-  import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+  import { getFirestore, doc, setDoc, getDoc, runTransaction } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 
   const firebaseConfig = {
     apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
@@ -91,35 +91,15 @@
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Generate or get device ID
+  // Generate persistent device ID
   const getDeviceId = () => {
     let deviceId = localStorage.getItem('deviceId');
     if (!deviceId) {
-      deviceId = crypto.randomUUID();
+      deviceId = 'device_' + crypto.randomUUID();
       localStorage.setItem('deviceId', deviceId);
     }
     return deviceId;
   };
-
-  // Check if device already has an account
-  const checkDeviceAccount = async (deviceId) => {
-    try {
-      const deviceRef = doc(db, "devices", deviceId);
-      const deviceSnap = await getDoc(deviceRef);
-      return deviceSnap.exists();
-    } catch (error) {
-      console.error("Error checking device account:", error);
-      return false;
-    }
-  };
-
-  // Toggle password visibility
-  document.getElementById('togglePassword').addEventListener('click', function() {
-    const passwordInput = document.getElementById('password');
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-    this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
-  });
 
   // Handle form submission
   document.getElementById('signupForm').addEventListener('submit', async (e) => {
@@ -132,13 +112,9 @@
     const buttonText = document.getElementById('buttonText');
     const loadingSpinner = document.getElementById('loadingSpinner');
 
-    // Validate passwords match
+    // Basic validation
     if (password !== confirmPassword) {
-      Swal.fire({
-        title: 'Error!',
-        text: 'Passwords do not match',
-        icon: 'error'
-      });
+      Swal.fire('Error!', 'Passwords do not match', 'error');
       return;
     }
 
@@ -151,45 +127,62 @@
     loadingSpinner.classList.remove('d-none');
 
     try {
-      // Check if device already has an account
-      const deviceHasAccount = await checkDeviceAccount(deviceId);
-      if (deviceHasAccount) {
-        throw new Error('This device already has an account. Only one account per device is allowed.');
+      // Step 1: Reserve the device slot (unauthenticated)
+      try {
+        await setDoc(doc(db, "devices", deviceId), {
+          userId: null, // Initially null
+          registeredAt: new Date()
+        });
+      } catch (error) {
+        if (error.code === 'permission-denied') {
+          // Device already exists, check if it has a user
+          const deviceDoc = await getDoc(doc(db, "devices", deviceId));
+          if (deviceDoc.exists() && deviceDoc.data().userId) {
+            throw new Error('This device already has an account. Only one account per device is allowed.');
+          }
+        }
+        throw error;
       }
 
-      // Create user in Firebase Auth
+      // Step 2: Create auth account
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
-      // Create user document in Firestore
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        email: email,
-        createdAt: new Date()
+      // Step 3: Transaction to link user to device
+      await runTransaction(db, async (transaction) => {
+        const deviceRef = doc(db, "devices", deviceId);
+        const deviceSnap = await transaction.get(deviceRef);
+        
+        if (!deviceSnap.exists()) {
+          throw "Device record missing";
+        }
+        
+        if (deviceSnap.data().userId) {
+          throw "Device already linked to another account";
+        }
+        
+        // Create user document
+        transaction.set(doc(db, "users", userCredential.user.uid), {
+          email: email,
+          createdAt: new Date(),
+          deviceId: deviceId
+        });
+        
+        // Link device to user
+        transaction.update(deviceRef, {
+          userId: userCredential.user.uid
+        });
       });
 
-      // Record device association (now with authenticated user)
-      await setDoc(doc(db, "devices", deviceId), {
-        userId: userCredential.user.uid,
-        registeredAt: new Date()
-      });
-
-      Swal.fire({
-        title: 'Success!',
-        text: 'Account created successfully',
-        icon: 'success'
-      }).then(() => {
-        window.location.href = 'dashboard.html';
-      });
+      Swal.fire('Success!', 'Account created successfully', 'success')
+        .then(() => window.location.href = 'dashboard.html');
+        
     } catch (error) {
       console.error("Signup error:", error);
-      Swal.fire({
-        title: 'Error!',
-        text: error.message.includes('permission') 
-          ? 'Account creation failed due to security rules. Please try again later.'
-          : error.message,
-        icon: 'error'
-      });
+      Swal.fire('Error!', 
+        error.message.includes('already has an account') ? error.message :
+        'Account creation failed. Please try again later.',
+        'error');
     } finally {
-      // Reset button state
       signupButton.disabled = false;
       buttonText.textContent = 'Sign Up';
       loadingSpinner.classList.add('d-none');
