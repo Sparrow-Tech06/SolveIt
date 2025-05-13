@@ -3,29 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Login - One Account Per Device</title>
+  <title>Secure Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">  
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
-    :root { 
+    :root {
       --bg-color: #B771E5;
       --form-color: #ffffff;
       --text-color: #000000;
     }
-    
     @media (prefers-color-scheme: dark) {
       :root {
         --bg-color: #3E3F5B;
         --form-color: #6a6b9c;
         --text-color: #f0f0f0;
       }
-    }  
-
+    }
     * {
       margin: 0;
       padding: 0;
@@ -33,83 +29,53 @@
       user-select: none;
       font-family: 'Poppins', sans-serif;
     }
-    
     body {
-      font-family: 'Poppins', sans-serif;
       min-height: 100vh;
       background: var(--bg-color);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      margin: 0;
-      padding: 20px;
     }
-
     main {
+      min-height: 70vh;
       background: var(--form-color);
       color: var(--text-color);
-      border-radius: 20px;
+      position: absolute;
+      bottom: 0;
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
       width: 100%;
-      max-width: 400px;
       padding: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    .form-control:focus {
-      border-color: #B771E5;
-      box-shadow: 0 0 0 0.25rem rgba(183, 113, 229, 0.25);
-    }
-    
-    .btn-primary {
-      background-color: #B771E5;
-      border-color: #B771E5;
-    }
-    
-    .btn-primary:hover {
-      background-color: #9b59d1;
-      border-color: #9b59d1;
+      box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body oncontextmenu="return false">
-
   <main class="container">
-    <div class="text-center mb-4">
-      <h3>Account Login</h3>
-      <p class="text-muted">One account per device</p>
-    </div>
-    
     <div class="card-body">
       <form id="loginForm" novalidate>
         <div class="mb-3">
           <label for="email" class="form-label">Email</label>
-          <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+          <input type="email" id="email" class="form-control" placeholder="Enter Email" required>
           <div class="invalid-feedback">Please enter a valid email</div>
         </div>
-        
         <div class="mb-3">
           <label for="password" class="form-label">Password</label>
           <div class="input-group">
-            <input type="password" id="password" class="form-control" placeholder="Enter password" required minlength="6">
-            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+            <input type="password" id="password" class="form-control" placeholder="Enter Password" required>
+            <button type="button" class="btn btn-secondary" id="togglePassword">
               <i class="bi bi-eye-slash"></i>
             </button>
+            <div class="invalid-feedback">Password must be at least 6 characters</div>
           </div>
-          <div class="invalid-feedback">Password must be at least 6 characters</div>
         </div>
-        
-        <button type="submit" class="btn btn-primary w-100 py-2" id="loginButton">
+        <button type="submit" class="btn btn-primary w-100" id="loginButton">
           <span id="buttonText">Login</span>
-          <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+          <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none"></span>
         </button>
       </form>
-      
-      <hr class="my-4">
-      
-      <p class="small text-center text-muted mt-3">
-        By logging in, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
-      </p>
+      <hr>
+      <p class="small text-center mt-2">For help, <a href="#" id="helpLink">Contact Us</a></p>
     </div>
   </main>
 
@@ -118,8 +84,8 @@
     import { 
       getAuth, 
       signInWithEmailAndPassword, 
-      onAuthStateChanged, 
-      createUserWithEmailAndPassword 
+      createUserWithEmailAndPassword,
+      onAuthStateChanged 
     } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
     import { 
       getFirestore, 
@@ -128,7 +94,6 @@
       getDoc 
     } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 
-    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
       authDomain: "authentication-b93f7.firebaseapp.com",
@@ -139,7 +104,6 @@
       measurementId: "G-85HL8MWJDC"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -152,13 +116,24 @@
     const loginButton = document.getElementById('loginButton');
     const buttonText = document.getElementById('buttonText');
     const loadingSpinner = document.getElementById('loadingSpinner');
+    const helpLink = document.getElementById('helpLink');
 
-    // Check if user is already logged in
+    // Auto-login if already logged in
     onAuthStateChanged(auth, (user) => {
       if (user) {
         window.location.href = 'dashboard.html';
       }
     });
+
+    // Input Validation
+    function validateEmail(email) {
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(email);
+    }
+
+    function validatePassword(password) {
+      return password.length >= 6;
+    }
 
     // Toggle Password Visibility
     togglePassword.addEventListener('click', function() {
@@ -167,30 +142,6 @@
       this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
     });
 
-    // Form Validation
-    function validateForm(email, password) {
-      let isValid = true;
-      
-      // Email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        emailInput.classList.add('is-invalid');
-        isValid = false;
-      } else {
-        emailInput.classList.remove('is-invalid');
-      }
-      
-      // Password validation
-      if (password.length < 6) {
-        passwordInput.classList.add('is-invalid');
-        isValid = false;
-      } else {
-        passwordInput.classList.remove('is-invalid');
-      }
-      
-      return isValid;
-    }
-
     // Form Submission
     loginForm.addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -198,97 +149,109 @@
       const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
       
-      // Validate form
-      if (!validateForm(email, password)) {
+      if (!validateEmail(email)) {
+        emailInput.classList.add('is-invalid');
         return;
+      } else {
+        emailInput.classList.remove('is-invalid');
       }
-      
+
+      if (!validatePassword(password)) {
+        passwordInput.classList.add('is-invalid');
+        return;
+      } else {
+        passwordInput.classList.remove('is-invalid');
+      }
+
       // Set loading state
       loginButton.disabled = true;
-      buttonText.textContent = 'Please wait...';
+      buttonText.textContent = 'Processing...';
       loadingSpinner.classList.remove('d-none');
-      
+
+      const deviceId = localStorage.getItem("deviceId") || crypto.randomUUID();
+      localStorage.setItem("deviceId", deviceId);
+
       try {
-        // Generate or get device ID
-        let deviceId = localStorage.getItem('deviceId');
-        if (!deviceId) {
-          deviceId = crypto.randomUUID();
-          localStorage.setItem('deviceId', deviceId);
-        }
-        
-        // Try to login first
+        // Try login first
         await signInWithEmailAndPassword(auth, email, password);
-        
-        // Login successful
-        Swal.fire({
-          title: 'Success!',
-          text: 'You have been logged in successfully',
-          icon: 'success'
-        }).then(() => {
+        Swal.fire("Success", "Login successful!", "success").then(() => {
           window.location.href = 'dashboard.html';
         });
-        
-      } catch (error) {
-        // Handle different error cases
-        if (error.code === 'auth/user-not-found') {
-          // Check if device already has an account
-          const deviceRef = doc(db, 'devices', deviceId);
+      } catch (loginError) {
+        if (loginError.code === 'auth/user-not-found') {
+          // Check if device already registered
+          const deviceRef = doc(db, "devices", deviceId);
           const deviceSnap = await getDoc(deviceRef);
-          
+
           if (deviceSnap.exists()) {
-            Swal.fire({
-              title: 'Device Limit Reached',
-              text: 'This device already has an account. Please login instead.',
-              icon: 'error'
+            Swal.fire("Error", "Only one account per device is allowed.", "error");
+            return;
+          }
+
+          // Try to create new account
+          try {
+            const userCred = await createUserWithEmailAndPassword(auth, email, password);
+            await setDoc(doc(db, "devices", deviceId), {
+              uid: userCred.user.uid,
+              email: email,
+              createdAt: new Date(),
+              deviceId: deviceId
             });
-          } else {
-            // Create new account for this device
-            try {
-              const userCred = await createUserWithEmailAndPassword(auth, email, password);
-              
-              // Save device info
-              await setDoc(doc(db, 'devices', deviceId), {
-                uid: userCred.user.uid,
-                email: email,
-                createdAt: new Date()
-              });
-              
-              // Save user info
-              await setDoc(doc(db, 'users', userCred.user.uid), {
-                email: email,
-                deviceId: deviceId,
-                createdAt: new Date()
-              });
-              
-              Swal.fire({
-                title: 'Account Created!',
-                text: 'Your account has been created successfully',
-                icon: 'success'
-              }).then(() => {
-                window.location.href = 'dashboard.html';
-              });
-              
-            } catch (createError) {
-              Swal.fire({
-                title: 'Registration Failed',
-                text: createError.message,
-                icon: 'error'
-              });
-            }
+            Swal.fire("Success", "Account created successfully!", "success").then(() => {
+              window.location.href = 'dashboard.html';
+            });
+          } catch (regError) {
+            handleAuthError(regError);
           }
         } else {
-          Swal.fire({
-            title: 'Login Failed',
-            text: error.message,
-            icon: 'error'
-          });
+          handleAuthError(loginError);
         }
       } finally {
-        // Reset loading state
         loginButton.disabled = false;
         buttonText.textContent = 'Login';
         loadingSpinner.classList.add('d-none');
       }
+    });
+
+    // Error handling
+    function handleAuthError(error) {
+      let message = "Authentication failed";
+      
+      switch(error.code) {
+        case 'auth/invalid-email':
+          message = "Invalid email format";
+          break;
+        case 'auth/user-disabled':
+          message = "Account disabled";
+          break;
+        case 'auth/user-not-found':
+          message = "Account not found";
+          break;
+        case 'auth/wrong-password':
+          message = "Incorrect password";
+          break;
+        case 'auth/email-already-in-use':
+          message = "Email already registered";
+          break;
+        case 'auth/operation-not-allowed':
+          message = "Email/password login disabled";
+          break;
+        case 'auth/weak-password':
+          message = "Password too weak (min 6 chars)";
+          break;
+        case 'auth/network-request-failed':
+          message = "Network error";
+          break;
+        default:
+          message = error.message || message;
+      }
+      
+      Swal.fire("Error", message, "error");
+    }
+
+    helpLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      emailInput.focus();
     });
   </script>
 </body>
