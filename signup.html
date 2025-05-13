@@ -75,7 +75,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
     import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-    import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+    import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
@@ -90,6 +90,23 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // Generate or get device ID
+    const getDeviceId = () => {
+      let deviceId = localStorage.getItem('deviceId');
+      if (!deviceId) {
+        deviceId = crypto.randomUUID();
+        localStorage.setItem('deviceId', deviceId);
+      }
+      return deviceId;
+    };
+
+    // Check if device already has an account
+    const checkDeviceAccount = async (deviceId) => {
+      const deviceRef = doc(db, "devices", deviceId);
+      const deviceSnap = await getDoc(deviceRef);
+      return deviceSnap.exists();
+    };
 
     // Toggle password visibility
     document.getElementById('togglePassword').addEventListener('click', function() {
@@ -120,6 +137,20 @@
         return;
       }
 
+      // Get device ID
+      const deviceId = getDeviceId();
+
+      // Check if device already has an account
+      const deviceHasAccount = await checkDeviceAccount(deviceId);
+      if (deviceHasAccount) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'This device already has an account. Only one account per device is allowed.',
+          icon: 'error'
+        });
+        return;
+      }
+
       // Show loading state
       signupButton.disabled = true;
       buttonText.textContent = 'Creating account...';
@@ -133,6 +164,12 @@
         await setDoc(doc(db, "users", userCredential.user.uid), {
           email: email,
           createdAt: new Date()
+        });
+
+        // Record device association
+        await setDoc(doc(db, "devices", deviceId), {
+          userId: userCredential.user.uid,
+          registeredAt: new Date()
         });
 
         Swal.fire({
