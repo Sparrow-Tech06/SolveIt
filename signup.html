@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title> My Sign Up</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fingerprintjs2@2.1.4/dist/fingerprint2.min.js"></script>
   <style>
-    :root {
+    :root { 
       --bg-color: #B771E5;
       --form-color: #ffffff;
       --text-color: #000000;
@@ -19,7 +20,7 @@
         --form-color: #6a6b9c;
         --text-color: #f0f0f0;
       }
-    }
+    }  
     body {
       font-family: 'Poppins', sans-serif;
       min-height: 100vh;
@@ -47,12 +48,12 @@
     <form id="signupForm">
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <input type="email" id="email" class="form-control" placeholder="Enter your email" required />
+        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
       </div>
       <div class="mb-3">
         <label for="password" class="form-label">Password (min 6 characters)</label>
         <div class="input-group">
-          <input type="password" id="password" class="form-control" placeholder="Create password" required minlength="6" />
+          <input type="password" id="password" class="form-control" placeholder="Create password" required minlength="6">
           <button type="button" class="btn btn-outline-secondary" id="togglePassword">
             <i class="bi bi-eye-slash"></i>
           </button>
@@ -60,7 +61,7 @@
       </div>
       <div class="mb-3">
         <label for="confirmPassword" class="form-label">Confirm Password</label>
-        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password" required minlength="6" />
+        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm password" required minlength="6">
       </div>
       <button type="submit" class="btn btn-primary w-100 mt-3" id="signupButton">
         <span id="buttonText">Sign Up</span>
@@ -72,6 +73,131 @@
     </div>
   </div>
 
-  <script type="module"> import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js'; import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js'; import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js'; const firebaseConfig = { apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk", authDomain: "authentication-b93f7.firebaseapp.com", projectId: "authentication-b93f7", storageBucket: "authentication-b93f7.appspot.com", messagingSenderId: "254632724536", appId: "1:254632724536:web:ecd4a8da767dbcc009becd", measurementId: "G-85HL8MWJDC" }; const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app); // 1️⃣ Generate or Get Unique Device ID function getOrCreateDeviceId() { let deviceId = localStorage.getItem("device_id"); if (!deviceId) { deviceId = "device-" + Math.random().toString(36).substr(2, 9); localStorage.setItem("device_id", deviceId); } return deviceId; } // 👁 Toggle password visibility document.getElementById('togglePassword').addEventListener('click', function() { const passwordInput = document.getElementById('password'); const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password'; passwordInput.setAttribute('type', type); this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>'; }); // 2️⃣ Handle form submission document.getElementById('signupForm').addEventListener('submit', async (e) => { e.preventDefault(); const email = document.getElementById('email').value.trim(); const password = document.getElementById('password').value; const confirmPassword = document.getElementById('confirmPassword').value; const signupButton = document.getElementById('signupButton'); const buttonText = document.getElementById('buttonText'); const loadingSpinner = document.getElementById('loadingSpinner'); if (password !== confirmPassword) { Swal.fire({ title: 'Error!', text: 'Passwords do not match', icon: 'error' }); return; } // 🔄 Show loading signupButton.disabled = true; buttonText.textContent = 'Creating account...'; loadingSpinner.classList.remove('d-none'); const deviceId = getOrCreateDeviceId(); const deviceRef = doc(db, "device_ids", deviceId); try { // 3️⃣ Check if this device already has an account const existing = await getDoc(deviceRef); if (existing.exists()) { Swal.fire({ title: 'Device Blocked!', text: 'An account has already been created on this device.', icon: 'warning' }); return; } // ✅ Create user const userCredential = await createUserWithEmailAndPassword(auth, email, password); const userId = userCredential.user.uid; // 🔐 Save user info await setDoc(doc(db, "users", userId), { email: email, createdAt: new Date() }); // 🧠 Save device info to prevent reuse await setDoc(deviceRef, { email: email, createdAt: new Date() }); Swal.fire({ title: 'Success!', text: 'Account created successfully', icon: 'success' }).then(() => { window.location.href = 'dashboard.html'; }); } catch (error) { Swal.fire({ title: 'Error!', text: error.message, icon: 'error' }); } finally { signupButton.disabled = false; buttonText.textContent = 'Sign Up'; loadingSpinner.classList.add('d-none'); } }); </script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
+      authDomain: "authentication-b93f7.firebaseapp.com",
+      projectId: "authentication-b93f7",
+      storageBucket: "authentication-b93f7.appspot.com",
+      messagingSenderId: "254632724536",
+      appId: "1:254632724536:web:ecd4a8da767dbcc009becd",
+      measurementId: "G-85HL8MWJDC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Function to generate or retrieve device ID
+    async function getDeviceId() {
+      return new Promise((resolve) => {
+        if (localStorage.getItem('deviceId')) {
+          resolve(localStorage.getItem('deviceId'));
+          return;
+        }
+
+        // Use FingerprintJS to generate a device fingerprint
+        if (typeof Fingerprint2 !== 'undefined') {
+          Fingerprint2.get((components) => {
+            const values = components.map(component => component.value);
+            const deviceId = Fingerprint2.x64hash128(values.join(''), 31);
+            localStorage.setItem('deviceId', deviceId);
+            resolve(deviceId);
+          });
+        } else {
+          // Fallback if FingerprintJS fails to load
+          const fallbackId = 'device-' + Math.random().toString(36).substr(2, 9) + 
+                            '-' + new Date().getTime().toString(36);
+          localStorage.setItem('deviceId', fallbackId);
+          resolve(fallbackId);
+        }
+      });
+    }
+
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+    });
+
+    // Handle form submission
+    document.getElementById('signupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const signupButton = document.getElementById('signupButton');
+      const buttonText = document.getElementById('buttonText');
+      const loadingSpinner = document.getElementById('loadingSpinner');
+
+      // Validate passwords match
+      if (password !== confirmPassword) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Passwords do not match',
+          icon: 'error'
+        });
+        return;
+      }
+
+      // Show loading state
+      signupButton.disabled = true;
+      buttonText.textContent = 'Creating account...';
+      loadingSpinner.classList.remove('d-none');
+
+      try {
+        // Get or generate device ID
+        const deviceId = await getDeviceId();
+        
+        // Check if this device already has an account
+        const deviceDoc = await getDoc(doc(db, "devices", deviceId));
+        if (deviceDoc.exists()) {
+          throw new Error('This device already has an account. Only one account per device is allowed.');
+        }
+
+        // Create user in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        
+        // Create user document in Firestore
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+          email: email,
+          createdAt: new Date(),
+          deviceId: deviceId
+        });
+
+        // Record the device ID to prevent future signups
+        await setDoc(doc(db, "devices", deviceId), {
+          userId: userCredential.user.uid,
+          registeredAt: new Date()
+        });
+
+        Swal.fire({
+          title: 'Success!',
+          text: 'Account created successfully',
+          icon: 'success'
+        }).then(() => {
+          window.location.href = 'dashboard.html';
+        });
+      } catch (error) {
+        Swal.fire({
+          title: 'Error!',
+          text: error.message,
+          icon: 'error'
+        });
+      } finally {
+        // Reset button state
+        signupButton.disabled = false;
+        buttonText.textContent = 'Sign Up';
+        loadingSpinner.classList.add('d-none');
+      }
+    });
+  </script>
 </body>
 </html>
