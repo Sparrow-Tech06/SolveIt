@@ -156,27 +156,27 @@
         // Get or generate device ID
         const deviceId = await getDeviceId();
         
-        // Check if this device already has an account
-        const deviceDoc = await getDoc(doc(db, "devices", deviceId));
-        if (deviceDoc.exists()) {
-          throw new Error('This device already has an account. Only one account per device is allowed.');
-        }
-
-        // Create user in Firebase Auth
+        // Create user in Firebase Auth first
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // Create user document in Firestore
-        await setDoc(doc(db, "users", userCredential.user.uid), {
+        // Now create all Firestore documents in a batch
+        const batch = writeBatch(db);
+        
+        // Create user document
+        batch.set(doc(db, "users", userCredential.user.uid), {
           email: email,
           createdAt: new Date(),
           deviceId: deviceId
         });
 
-        // Record the device ID to prevent future signups
-        await setDoc(doc(db, "devices", deviceId), {
+        // Record the device ID
+        batch.set(doc(db, "devices", deviceId), {
           userId: userCredential.user.uid,
           registeredAt: new Date()
         });
+
+        // Commit the batch
+        await batch.commit();
 
         Swal.fire({
           title: 'Success!',
@@ -186,11 +186,25 @@
           window.location.href = 'dashboard.html';
         });
       } catch (error) {
+        let errorMessage = error.message;
+        
+        // More user-friendly error messages
+        if (error.code === 'permission-denied') {
+          errorMessage = "This device already has an account. Only one account per device is allowed.";
+        } else if (error.code === 'auth/email-already-in-use') {
+          errorMessage = "This email is already registered. Please use a different email.";
+        }
+        
         Swal.fire({
           title: 'Error!',
-          text: error.message,
+          text: errorMessage,
           icon: 'error'
         });
+        
+        // If account creation failed but auth user was created, delete it
+        if (auth.currentUser) {
+          await auth.currentUser.delete();
+        }
       } finally {
         // Reset button state
         signupButton.disabled = false;
@@ -199,5 +213,6 @@
       }
     });
   </script>
+  
 </body>
 </html>
