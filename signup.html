@@ -92,79 +92,39 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Enhanced device fingerprinting with clone app detection
-    async function getEnhancedDeviceId() {
+    // Function to generate or retrieve device ID
+    async function getDeviceId() {
       return new Promise((resolve) => {
-        // Check for existing ID first
-        if (localStorage.getItem('secureDeviceId')) {
-          resolve(localStorage.getItem('secureDeviceId'));
+        if (localStorage.getItem('deviceId')) {
+          resolve(localStorage.getItem('deviceId'));
           return;
         }
 
-        // Detect common clone app signatures
-        const isLikelyCloneApp = () => {
-          try {
-            // Check for common clone app package names
-            const packages = [
-              'com.lbe.parallel', 'com.excelliance.dualaid',
-              'com.parallel.space', 'com.cloneapp'
-            ];
-            
-            // Check for abnormal screen dimensions
-            const screenRatio = window.screen.width / window.screen.height;
-            const isAbnormalScreen = screenRatio < 0.5 || screenRatio > 2.2;
-            
-            // Check for abnormal device memory
-            const isLowMemory = navigator.deviceMemory < 2;
-            
-            // Check for WebGL vendor anomalies
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            const debugInfo = gl?.getExtension('WEBGL_debug_renderer_info');
-            const vendor = debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : '';
-            const isSuspiciousVendor = vendor.includes('Parallel') || vendor.includes('Clone');
-            
-            return isAbnormalScreen || isLowMemory || isSuspiciousVendor;
-          } catch (e) {
-            return false;
-          }
-        };
-
-        if (isLikelyCloneApp()) {
-          resolve('clone-app-detected');
-          return;
-        }
-
-        // Generate fingerprint using multiple stable sources
+        // Use FingerprintJS to generate a device fingerprint
         if (typeof Fingerprint2 !== 'undefined') {
           Fingerprint2.get((components) => {
-            const stableComponents = components.filter(c => 
-              c.key !== 'user_agent' && 
-              c.key !== 'language' && 
-              c.key !== 'color_depth'
-            );
-            
-            const values = stableComponents.map(c => c.value);
-            const enhancedId = Fingerprint2.x64hash128(values.join(''), 31) + 
-                             '-' + navigator.hardwareConcurrency +
-                             '-' + (screen.availWidth * screen.availHeight);
-            
-            localStorage.setItem('secureDeviceId', enhancedId);
-            resolve(enhancedId);
+            const values = components.map(component => component.value);
+            const deviceId = Fingerprint2.x64hash128(values.join(''), 31);
+            localStorage.setItem('deviceId', deviceId);
+            resolve(deviceId);
           });
         } else {
-          // Fallback fingerprint
-          const fallbackId = 'device-' + 
-                           navigator.hardwareConcurrency + '-' +
-                           screen.availWidth + 'x' + screen.availHeight + '-' +
-                           (performance.memory?.jsHeapSizeLimit || '') + '-' +
-                           new Date().getTime().toString(36);
-          
-          localStorage.setItem('secureDeviceId', fallbackId);
+          // Fallback if FingerprintJS fails to load
+          const fallbackId = 'device-' + Math.random().toString(36).substr(2, 9) + 
+                            '-' + new Date().getTime().toString(36);
+          localStorage.setItem('deviceId', fallbackId);
           resolve(fallbackId);
         }
       });
     }
+
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+    });
 
     // Handle form submission
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
@@ -193,41 +153,29 @@
       loadingSpinner.classList.remove('d-none');
 
       try {
-        // Get enhanced device ID
-        const deviceId = await getEnhancedDeviceId();
+        // Get or generate device ID
+        const deviceId = await getDeviceId();
         
-        // Block if clone app detected
-        if (deviceId === 'clone-app-detected') {
-          throw new Error('Multiple account creation not allowed from this app.');
-        }
-
-        // Check existing device records
-        const deviceDoc = await getDoc(doc(db, "devices", deviceId));
-        if (deviceDoc.exists()) {
-          throw new Error('This device already has an account. Only one account per device is allowed.');
-        }
-
-        // Create user in Firebase Auth
+        // Create user in Firebase Auth first
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // Create batch operation
+        // Create a write batch
         const batch = writeBatch(db);
         
         // Create user document
         batch.set(doc(db, "users", userCredential.user.uid), {
           email: email,
           createdAt: new Date(),
-          deviceId: deviceId,
-          deviceFingerprint: await getDeviceFingerprintData()
+          deviceId: deviceId
         });
 
         // Record the device ID
         batch.set(doc(db, "devices", deviceId), {
           userId: userCredential.user.uid,
-          registeredAt: new Date(),
-          ipAddress: await getIPAddress() // Additional security layer
+          registeredAt: new Date()
         });
 
+        // Commit the batch
         await batch.commit();
 
         Swal.fire({
@@ -240,10 +188,11 @@
       } catch (error) {
         let errorMessage = error.message;
         
+        // More user-friendly error messages
         if (error.code === 'permission-denied') {
-          errorMessage = "Account creation failed due to security restrictions.";
+          errorMessage = "This device already has an account. Only one account per device is allowed.";
         } else if (error.code === 'auth/email-already-in-use') {
-          errorMessage = "This email is already registered.";
+          errorMessage = "This email is already registered. Please use a different email.";
         }
         
         Swal.fire({
@@ -252,53 +201,21 @@
           icon: 'error'
         });
         
-        // Cleanup if auth user was created
+        // If account creation failed but auth user was created, delete it
         if (auth.currentUser) {
           try {
             await auth.currentUser.delete();
           } catch (deleteError) {
-            console.error("Cleanup failed:", deleteError);
+            console.error("Error deleting user:", deleteError);
           }
         }
       } finally {
+        // Reset button state
         signupButton.disabled = false;
         buttonText.textContent = 'Sign Up';
         loadingSpinner.classList.add('d-none');
       }
     });
-
-    // Additional security functions
-    async function getDeviceFingerprintData() {
-      return {
-        screen: `${window.screen.width}x${window.screen.height}`,
-        cores: navigator.hardwareConcurrency,
-        renderer: await getWebGLRenderer(),
-        memory: navigator.deviceMemory || 'unknown',
-        touchSupport: navigator.maxTouchPoints > 0,
-        platform: navigator.platform
-      };
-    }
-
-    async function getWebGLRenderer() {
-      try {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-        return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'unknown';
-      } catch (e) {
-        return 'error';
-      }
-    }
-
-    async function getIPAddress() {
-      try {
-        const response = await fetch('https://api.ipify.org?format=json');
-        const data = await response.json();
-        return data.ip || 'unknown';
-      } catch (e) {
-        return 'unknown';
-      }
-    }
   </script>
   
 </body>
