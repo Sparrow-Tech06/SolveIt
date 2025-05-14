@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> my Sign Up</title>
+  <title> Sign Up</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -76,7 +76,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
     import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-    import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+    import { getFirestore, doc, setDoc, getDoc, writeBatch } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
@@ -159,7 +159,7 @@
         // Create user in Firebase Auth first
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         
-        // Now create all Firestore documents in a batch
+        // Create a write batch
         const batch = writeBatch(db);
         
         // Create user document
@@ -203,7 +203,11 @@
         
         // If account creation failed but auth user was created, delete it
         if (auth.currentUser) {
-          await auth.currentUser.delete();
+          try {
+            await auth.currentUser.delete();
+          } catch (deleteError) {
+            console.error("Error deleting user:", deleteError);
+          }
         }
       } finally {
         // Reset button state
