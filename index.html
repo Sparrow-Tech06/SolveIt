@@ -332,14 +332,6 @@
                 </li>
             </ul>
 
-
-            <div class="card-body">
-              <div id="auth-content" style="display: none;">
-                <p class="mb-3 user-email"> Wellcome : <strong id="user-email"></strong></p>
-                <button id="logout-btn" class="btn btn-danger">Logout</button>
-              </div>
-            </div>
-
             <!-- Follow Us Section --->
             <div class="text-center mt-4">
                 <h6 style="color: var(--text-color);"> Follow Us On </h6>
@@ -403,73 +395,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-    <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
-    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAUAVJ9rGBufA1NWYoh8Eym8EoPVB5h1gk",
-      authDomain: "authentication-b93f7.firebaseapp.com",
-      projectId: "authentication-b93f7",
-      storageBucket: "authentication-b93f7.appspot.com",
-      messagingSenderId: "254632724536",
-      appId: "1:254632724536:web:ecd4a8da767dbcc009becd",
-      measurementId: "G-85HL8MWJDC"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // DOM Elements
-    const loadingSpinner = document.querySelector('.loading-spinner');
-    const authContent = document.getElementById('auth-content');
-    const userEmail = document.getElementById('user-email');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    // Show loading spinner
-    function showLoading() {
-      loadingSpinner.style.display = 'block';
-    }
-
-    // Hide loading spinner
-    function hideLoading() {
-      loadingSpinner.style.display = 'none';
-    }
-
-    // Logout function
-    async function handleLogout() {
-      try {
-        showLoading();
-        await signOut(auth);
-        window.location.href = "index.html";
-      } catch (error) {
-        hideLoading();
-        Swal.fire("Error", error.message, "error");
-      }
-    }
-
-    // Auth state listener
-    showLoading();
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Show user email and logout button
-        userEmail.textContent = user.email;
-        authContent.style.display = 'block';
-        hideLoading();
-      } else {
-        Swal.fire("Access Denied", "You must be logged in to view this page.", "error")
-          .then(() => {
-            window.location.href = "index.html";
-          });
-      }
-    });
-
-    // Event listeners
-    logoutBtn.addEventListener('click', handleLogout);
-  </script>
-    
-    
     <!-- Include the connection alert JS -->
     <script src="connection-alert.js?v=1.4"></script>
 
