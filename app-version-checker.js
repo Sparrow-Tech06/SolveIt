@@ -28,7 +28,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 // Redirect to Play Store or APK link
-                window.location.href = "https://your-update-link.com";
+                window.location.href = "https://t.me/Cash_Babu";
             }
         });
     }
