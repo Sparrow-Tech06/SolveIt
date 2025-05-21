@@ -29,6 +29,11 @@
             if (result.isConfirmed) {
                 // Redirect to Play Store or APK link
                 window.location.href = "https://t.me/Cash_Babu";
+
+                // Re-check version after user returns
+                setTimeout(() => {
+                    checkVersionLoop(); // Will re-open popup if version still mismatches
+                }, 1000); // Wait 1 seconds before re-checking
             }
         });
     }
