@@ -16,24 +16,13 @@
             icon: "warning",
             allowOutsideClick: false,
             allowEscapeKey: false,
-            showConfirmButton: true,
-            confirmButtonText: "Update Now",
-            confirmButtonColor: "#3085d6",
+            showConfirmButton: false,
+            showCancelButton: false,
             backdrop: true,
             didOpen: () => {
                 // Optional: Disable closing via clicking background
                 const popup = Swal.getPopup();
                 popup.classList.add("no-close");
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Redirect to Play Store or APK link
-                window.location.href = "https://t.me/Cash_Babu";
-
-                // Re-check version after user returns
-                setTimeout(() => {
-                    checkVersionLoop(); // Will re-open popup if version still mismatches
-                }, 1000); // Wait 1 seconds before re-checking
             }
         });
     }
