@@ -531,18 +531,24 @@
     let offsetX = 0, offsetY = 0, isDragging = false;
 
     function setPosition(x, y) {
-      btn.style.left = x + "px";
-      btn.style.top = y + "px";
+      // Ensure button stays within window
+      const maxX = window.innerWidth - btn.offsetWidth;
+      const maxY = window.innerHeight - btn.offsetHeight;
+      const finalX = Math.max(0, Math.min(x, maxX));
+      const finalY = Math.max(0, Math.min(y, maxY));
+
+      btn.style.left = finalX + "px";
+      btn.style.top = finalY + "px";
       btn.style.right = "auto";
       btn.style.bottom = "auto";
     }
 
     // Desktop (Mouse)
     btn.addEventListener("mousedown", function (e) {
-      isDragging = true;
       const rect = btn.getBoundingClientRect();
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
+      isDragging = true;
       e.preventDefault();
     });
 
@@ -557,11 +563,11 @@
 
     // Mobile (Touch)
     btn.addEventListener("touchstart", function (e) {
-      isDragging = true;
-      const touch = e.touches[0];
       const rect = btn.getBoundingClientRect();
+      const touch = e.touches[0];
       offsetX = touch.clientX - rect.left;
       offsetY = touch.clientY - rect.top;
+      isDragging = true;
     });
 
     document.addEventListener("touchmove", function (e) {
