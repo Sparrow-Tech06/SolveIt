@@ -31,30 +31,30 @@
       font-family: 'Inter', sans-serif;
     }
 /************************************************/
-    .header {
-      background-color: var(--header-bg);
-      padding: 1rem 1.5rem;
-      position: sticky;
-      top: 0;
-      z-index: 999;
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .header i {
-      font-size: 1.4rem;
-      margin-right: 10px;
-      color: #6c757d;
-      cursor: pointer;
-    }
-
-    .header span {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #343a40;
-    }
-
+      .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 10px ;
+            background-color: var(--header-bg);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          }
+          .header-title {
+            margin: 0 auto;
+            text-align: center;
+            color: var(--text-color);
+          }
+       .header .bi {
+            background: #fff ; /* Modern purple color */
+            color: #6C63FF; /* White icon */
+            font-size: 1.2rem;
+            padding: 4px 10px;
+            border-radius: 8px; /* Slightly larger rounded corners */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+/*************************************************/
     .profile-card {
       background: #ffffff;
       border-radius: 20px;
@@ -122,10 +122,10 @@
 <body>
 
   <!-- Sticky Header -->
-  <div class="header">
-    <i class="bi bi-arrow-left"></i>
-  </div>
-
+  <header class="header">
+        <i class="bi bi-arrow-left" onclick="window.history.back()"></i>
+    </header>
+ <div class="container"> <!--Start Container Here -->
   <!-- Profile Section -->
   <div class="profile-card">
     <img src="https://img.icons8.com/clouds/100/user.png" alt="User Icon">
@@ -184,6 +184,7 @@
     </div>
 
   </div>
-
+ </div> <!-- End Container Here -->
+  
 </body>
 </html>
