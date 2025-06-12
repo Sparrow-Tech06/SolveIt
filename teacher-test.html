@@ -19,7 +19,13 @@
             --light-color: #f8f9fa;
             --dark-color: #212529;
         }
-        
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                
+            }
+        }
+   /*************************************************/     
         body {
             max-width: 660px;
             margin: 0 auto;
@@ -28,7 +34,7 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--background-color) ;
         }
-        
+  /**************************************************/      
         .question-card {
             margin-bottom: 15px;
             border-left: 4px solid var(--primary-color);
@@ -151,7 +157,7 @@
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false">
     <div class="container">
         <h1 class="text-center mb-3">Math Test</h1>
         
