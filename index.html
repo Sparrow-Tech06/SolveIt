@@ -48,6 +48,7 @@
             --close-btn-filter: invert(0);
 
             --bottom-nav-bg: #ffffff;
+            --bottom-item-bg: linear-gradient(135deg, #687EFF, #a3b3ff);
             
             --color1: #a3d5ff ;
             --color2: #cbb6ff ;
@@ -73,6 +74,7 @@
                 --close-btn-filter: invert(1);
 
                 --bottom-nav-bg: #6a6b9c ;
+                --bottom-item-bg: linear-gradient(135deg, #4D56A0, #848ACB);
                 
                 --color1: #1dd1a1;
                 --color3: #ff6b6b;
@@ -295,7 +297,7 @@
     }
 
     .nav-item-custom.active {
-      background: linear-gradient(135deg, #687EFF, #a3b3ff);
+      background: var(--bottom-item-bg);
       color: #fff;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
