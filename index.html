@@ -46,6 +46,8 @@
             
             --offcanvas-header:  none;
             --close-btn-filter: invert(0);
+
+            --bottom-nav-bg: #ffffff;
             
             --color1: #a3d5ff ;
             --color2: #cbb6ff ;
@@ -69,6 +71,8 @@
                 
                 --offcanvas-header: #6a6b9c ;
                 --close-btn-filter: invert(1);
+
+                --bottom-nav-bg: #6a6b9c ;
                 
                 --color1: #1dd1a1;
                 --color3: #ff6b6b;
@@ -266,8 +270,8 @@
       position: fixed;
       bottom: 0;
       width: 100%;
-      background-color: #fff;
-      box-shadow: 0 -1px 8px rgba(0, 0, 0, 0.1);
+      background-color: var(--bottom-nav-bg);
+      box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.1);
       border-top-left-radius: 18px;
       border-top-right-radius: 18px;
       padding: 8px 15px;
