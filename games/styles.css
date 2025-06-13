@@ -77,6 +77,7 @@
             padding: 20px;
             animation: fadeIn 0.5s ease-in-out;
             box-shadow: 0px 2px 4px rgba(0, 0, 0,  0.1);
+            position: relative; 
         }
         
         @keyframes fadeIn {
@@ -155,6 +156,42 @@
          color: #ff5722;
          margin-bottom: 0px;
        }
+
+     .hint-answer {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        /* Skeleton Loading Animation */
+        .skeleton-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            z-index: 10;
+        }
+        
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        /* Hide content while loading */
+        .content-hidden {
+            opacity: 0;
+        }
         
         
         
