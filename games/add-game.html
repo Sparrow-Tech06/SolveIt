@@ -25,28 +25,42 @@
     </header>
         
     <div class="game-card text-center">
-        <h1 class="mb-4 text">Addition Game</h1>
+        <!-- Skeleton Loading -->
+        <div class="skeleton-loading" ng-show="isLoading"></div>
         
-        <p class="fs-4 quiz-box">
-            What is <b class="text-primary">{{ num1 }}</b> + <b class="text-primary">{{ num2 }}</b> ?
-        </p>
-        
-        <div class="progress">
-            <div class="progress-bar bg-danger" role="progressbar" 
-                style="width: {{ timerProgress }}%;" aria-valuemin="0" aria-valuemax="100">
+        <div ng-class="{'content-hidden': isLoading}">
+            <h1 class="mb-4 text">Addition Game</h1>
+            
+            <p class="fs-4 quiz-box">
+                What is <b class="text-primary">{{ num1 }}</b> + <b class="text-primary">{{ num2 }}</b> ?
+            </p>
+            
+            <div class="progress">
+                <div class="progress-bar bg-danger" role="progressbar" 
+                    style="width: {{ timerProgress }}%;" aria-valuemin="0" aria-valuemax="100">
+                </div>
             </div>
+            
+            <p class="timer">Wait: {{ timer }}s</p>
+            
+            <input type="number" class="form-control" placeholder="Enter Answer" 
+                ng-model="userAnswer" ng-disabled="timer > 0">
+            
+            <div class="d-flex gap-2 mt-2">
+                <button class="btn btn-success flex-grow-1" ng-click="submitAnswer()" ng-disabled="timer > 0">
+                    Submit
+                </button>
+                <button class="btn btn-info" ng-click="showHint()" ng-disabled="hintUsed">
+                    <i class="bi bi-lightbulb"></i> Hint
+                </button>
+            </div>
+            
+            <div class="hint-answer" ng-show="showHintAnswer">
+                Answer: {{ correctAnswer }}
+            </div>
+            
+            <p class="feedback mt-3" ng-class="feedbackClass">{{ feedback }}</p>
         </div>
-        
-        <p class="timer">Wait: {{ timer }}s</p>
-        
-        <input type="number" class="form-control" placeholder="Enter Answer" 
-            ng-model="userAnswer" ng-disabled="timer > 0">
-        
-        <button class="btn btn-dark w-100 mt-1" ng-click="submitAnswer()" ng-disabled="timer > 0">
-            Submit
-        </button>
-        
-        <p class="feedback mt-5" ng-class="feedbackClass">{{ feedback }}</p>
     </div>
 
 
@@ -58,20 +72,71 @@
     <script>
         const app = angular.module("mathGameApp", []);
         app.controller("gameController", function ($scope, $interval) {
-            function generateQuestion() {
+            // Initialize daily plays counter
+            $scope.initDailyPlays = function() {
+                const today = new Date().toDateString();
+                const storedData = localStorage.getItem('additionGameData');
+                
+                if (storedData) {
+                    const data = JSON.parse(storedData);
+                    if (data.date === today) {
+                        $scope.dailyPlays = data.plays;
+                    } else {
+                        $scope.dailyPlays = 0;
+                        localStorage.setItem('additionGameData', JSON.stringify({
+                            date: today,
+                            plays: 0
+                        }));
+                    }
+                } else {
+                    $scope.dailyPlays = 0;
+                    localStorage.setItem('additionGameData', JSON.stringify({
+                        date: today,
+                        plays: 0
+                    }));
+                }
+            };
+            
+            $scope.incrementDailyPlays = function() {
+                $scope.dailyPlays++;
+                const today = new Date().toDateString();
+                localStorage.setItem('additionGameData', JSON.stringify({
+                    date: today,
+                    plays: $scope.dailyPlays
+                }));
+            };
+            
+            // Initialize game
+            $scope.initGame = function() {
+                $scope.isLoading = true;
+                $scope.showHintAnswer = false;
+                $scope.hintUsed = false;
+                
+                // Simulate loading for 3 seconds
+                setTimeout(() => {
+                    $scope.isLoading = false;
+                    $scope.generateQuestion();
+                    $scope.resetGame();
+                    $scope.$apply();
+                }, 3000);
+            };
+            
+            $scope.generateQuestion = function() {
                 $scope.num1 = Math.floor(Math.random() * 50) + 1;
                 $scope.num2 = Math.floor(Math.random() * 50) + 1;
                 $scope.correctAnswer = $scope.num1 + $scope.num2;
-            }
+            };
             
-            function resetGame() {
+            $scope.resetGame = function() {
                 $scope.feedback = "";
                 $scope.userAnswer = null;
-                startTimer();
-            }
+                $scope.showHintAnswer = false;
+                $scope.hintUsed = false;
+                $scope.startTimer();
+            };
             
-            function startTimer() {
-                $scope.timer = 6;
+            $scope.startTimer = function() {
+                $scope.timer = 2; // Changed to 2 seconds as requested
                 $scope.timerProgress = 100;
                 
                 if ($scope.countdown) {
@@ -81,14 +146,19 @@
                 $scope.countdown = $interval(() => {
                     if ($scope.timer > 0) {
                         $scope.timer--;
-                        $scope.timerProgress = ($scope.timer / 6) * 100;
+                        $scope.timerProgress = ($scope.timer / 2) * 100; // Adjusted for 2 seconds
                     } else {
                         $interval.cancel($scope.countdown);
                     }
                 }, 1000);
-            }
+            };
             
-            $scope.submitAnswer = function () {
+            $scope.showHint = function() {
+                $scope.showHintAnswer = true;
+                $scope.hintUsed = true;
+            };
+            
+            $scope.submitAnswer = function() {
                 if ($scope.timer > 0) {
                     $scope.feedback = "⏳ Wait for the timer!";
                     $scope.feedbackClass = "wrong";
@@ -103,16 +173,18 @@
                     $scope.feedbackClass = "wrong";
                 }
                 
+                $scope.incrementDailyPlays();
+                
                 setTimeout(() => {
-                    generateQuestion();
-                    resetGame();
+                    $scope.generateQuestion();
+                    $scope.resetGame();
                     $scope.$apply();
                 }, 3000);
             };
 
             // Initialize the game
-            generateQuestion();
-            resetGame();
+            $scope.initDailyPlays();
+            $scope.initGame();
         });
     </script>
     
