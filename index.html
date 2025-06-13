@@ -56,6 +56,8 @@
             --color4: #ff99c1 ;
             --color5: #F7CFD8 ;
             --color6: #a3eeff ;
+
+            --animation: zoomIn 0.8s ease-in-out;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -219,7 +221,19 @@
             width: 100%;
             max-width: 100%;
             margin: 0 auto;
+            animation : var(--animation) ;
         }
+
+        @keyframes zoomIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
 
         .sound-box {
             background-color: #dbefff;
