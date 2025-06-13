@@ -23,7 +23,9 @@
     <header class="header">
         <i class="bi bi-arrow-left" onclick="window.history.back()"></i>
     </header>
-        
+    
+        <span class="badge">Today's Plays: {{ dailyPlays }}</span>
+    
     <div class="game-card text-center">
         <!-- Skeleton Loading -->
         <div class="skeleton-loading" ng-show="isLoading"></div>
