@@ -19,7 +19,10 @@
         --text-color : #000000 ;
 
         --menu-item : #ffffff ;
+        --icon-container: #e9f2ff ;
         --small : #6c757d ;
+         
+        --animation: zoomIn 0.8s ease-in-out;
    }
 
 @media (prefers-color-scheme: dark) {
@@ -29,6 +32,7 @@
               --text-color : #ffffff ;
 
               --menu-item : #6a6b9c ;
+              --icon-container: #f8f9fa ;
               --small : #f8f9fa ;
             }
         }
@@ -102,6 +106,7 @@
       height: 80px;
       border-radius: 50%;
       margin-bottom: 10px;
+      animation : var(--animation) ;
     }
 
     .app-version {
@@ -123,10 +128,11 @@
       color: var(--text-color);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
       cursor: pointer ;
+      animation : var(--animation) ;
     }
 
     .icon-container {
-      background-color: #e9f2ff;
+      background-color: var(--icon-container) ;
       border-radius: 12px;
       padding: 8px 12px;
       display: flex;
@@ -151,6 +157,18 @@
       color: var(--small);
       font-size: 0.85rem;
     }
+
+    @keyframes zoomIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+    
   </style>
 </head>
 <body oncontextmenu="return false">
