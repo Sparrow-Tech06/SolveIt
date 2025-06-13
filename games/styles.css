@@ -199,6 +199,15 @@
              color: var(--text-color);
              margin: 20px;
         }
+
+      .btn-info {
+           background-color: #888888 ;
+           color: #ffffff ;
+      }
+    .btn-success {
+           background-color: #999bff ;
+           color: #ffffff ;
+      }
         
         
         
