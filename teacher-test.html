@@ -21,7 +21,8 @@
             --warning-color: #f8961e;
             --light-color: #f8f9fa;
             --dark-color: #212529;
-
+            --text-color : #000000;
+            
             --submit-container : #ffffff;
             --header-bg : #687EFF ;
 
@@ -31,7 +32,8 @@
         @media (prefers-color-scheme: dark) {
             :root {
                 --background-color: #3E3F5B ;
-
+                --text-color : #ffffff;
+                
                 --submit-container : #6a6b9c ;
                 --header-bg : #6a6b9c ;
 
@@ -89,6 +91,7 @@
             margin-bottom: 15px;
             border-left: 4px solid var(--primary-color);
             border-radius: 8px;
+            color: var(--text-color) ;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             background-color: var(--question-card) ;
         }
