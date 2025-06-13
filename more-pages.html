@@ -14,6 +14,8 @@
         --background-color : #ffffff ;
         --header-bg : #687EFF ;
         --text-color : #000000 ;
+
+        --menu-item : #ffffff ;
    }
 
 @media (prefers-color-scheme: dark) {
@@ -97,14 +99,14 @@
     }
 
     .menu-item {
-      background-color: #ffffff;
+      background-color: var(--menu-item) ;
       border-radius: 16px;
       padding: 1rem;
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-      transition: all 0.2s ease;
+      cursor: pointer ;
     }
 
     .icon-container {
