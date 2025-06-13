@@ -12,6 +12,8 @@
                --heading-text: #000 ;
 
                --primary-text: #60B5FF ;
+
+               --skeleton: linear-gradient(135deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%) ;
            }
     
     @media (prefers-color-scheme: dark) {
@@ -28,6 +30,8 @@
                 --heading-text: #FFD65A ;
 
                 --primary-text: #F1EFEC ;
+
+                --skeleton: linear-gradient(135deg, #4A4B6A 25%, #5A5B7A 50%, #4A4B6A 75%) ;
            }
         
     }    
@@ -173,7 +177,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background: var(--skeleton);
             background-size: 200% 100%;
             animation: shimmer 1.5s infinite;
             z-index: 10;
