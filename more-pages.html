@@ -16,6 +16,7 @@
         --text-color : #000000 ;
 
         --menu-item : #ffffff ;
+        --small : #6c757d ;
    }
 
 @media (prefers-color-scheme: dark) {
@@ -25,6 +26,7 @@
               --text-color : #ffffff ;
 
               --menu-item : #6a6b9c ;
+              --small : #f8f9fa ;
             }
         }
   /*******************************************/
@@ -115,6 +117,7 @@
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
+      color: var(--text-color);
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
       cursor: pointer ;
     }
@@ -138,11 +141,11 @@
       margin: 0;
       font-weight: 600;
       font-size: 1rem;
-      color: #343a40;
+      color: var(--text-color);
     }
 
     .menu-text small {
-      color: #6c757d;
+      color: var(--small);
       font-size: 0.85rem;
     }
   </style>
